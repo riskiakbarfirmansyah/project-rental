@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum CarType {
+  SEDAN
+  SUV
+  MPV
+  PICKUP
+  MINIBUS
+  SPORT
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+}
+
+enum FuelType {
+  BENSIN
+  DIESEL
+  ELECTRIC
+  HYBRID
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(CUSTOMER)
+  phone     String?
+  address   String?   @db.Text
+  avatar    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  bookings  Booking[]
+  blogPosts BlogPost[]
+
+  @@map("users")
+}
+
+model Car {
+  id           String       @id @default(cuid())
+  name         String
+  brand        String
+  year         Int
+  type         CarType
+  pricePerDay  Int
+  seats        Int
+  transmission Transmission
+  fuel         FuelType
+  description  String       @db.Text
+  features     String       @db.Text  // JSON string array
+  imageUrl     String?
+  images       String?      @db.Text  // JSON array of image urls
+  isAvailable  Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  bookings     Booking[]
+  galleryItems GalleryItem[]
+
+  @@map("cars")
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  userId         String
+  carId          String
+  startDate      DateTime
+  endDate        DateTime
+  totalDays      Int
+  totalPrice     Int
+  pickupLocation String
+  notes          String?       @db.Text
+  status         BookingStatus @default(PENDING)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  car  Car  @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   @db.LongText
+  excerpt     String   @db.Text
+  imageUrl    String?
+  authorId    String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("blog_posts")
+}
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String
+  carId       String?
+  createdAt   DateTime @default(now())
+
+  car Car? @relation(fields: [carId], references: [id], onDelete: SetNull)
+
+  @@map("gallery_items")
+}
+
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String   @db.Text
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("faq_items")
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("contact_messages")
+}
+
+model SiteConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("site_configs")
+}
