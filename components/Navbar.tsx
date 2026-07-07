@@ -62,13 +62,14 @@ export default function Navbar() {
             <Image
               src="/images/logo-no-bg.png"
               alt="Bella Belly Trans Co"
-              width={180}
-              height={62}
+              width={110}
+              height={38}
               priority
               style={{
-                width: "170px",
+                width: "110px",
                 height: "auto",
                 objectFit: "contain",
+                filter: "grayscale(100%) brightness(0)",
               }}
             />
           </Link>
@@ -90,38 +91,36 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="navbar-actions">
-            {user ? (
+            {user && user.role === "ADMIN" ? (
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                {user.role === "ADMIN" && (
-                  <Link href="/admin" className="btn btn-sm btn-outline" id="nav-admin">
-                    Dashboard
-                  </Link>
-                )}
-                <Link href="/profile" id="nav-profile" style={{
-                  display: "flex", alignItems: "center", gap: "0.5rem",
-                  padding: "0.375rem 0.875rem", background: "var(--surface-2)",
-                  borderRadius: "var(--radius-full)", fontSize: "0.9rem",
-                  fontWeight: 600, color: "var(--text-primary)"
-                }}>
-                  <span style={{
-                    width: 28, height: 28, borderRadius: "50%", background: "var(--gradient-primary)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "white", fontSize: "0.75rem", fontWeight: 700
-                  }}>
-                    {user.name[0].toUpperCase()}
-                  </span>
-                  {user.name.split(" ")[0]}
+                <Link href="/admin" className="btn btn-sm btn-primary" id="nav-admin">
+                  Dashboard Admin
                 </Link>
                 <button onClick={handleLogout} className="btn btn-sm" id="nav-logout"
-                  style={{ background: "var(--error-light)", color: "var(--error)", border: "none" }}>
+                  style={{ background: "var(--surface-2)", color: "var(--text-secondary)", border: "none" }}>
                   Keluar
                 </button>
               </div>
             ) : (
-              <>
-                <Link href="/login" className="btn btn-sm btn-outline" id="nav-login">Masuk</Link>
-                <Link href="/register" className="btn btn-sm btn-primary" id="nav-register">Daftar</Link>
-              </>
+              /* Link admin tersembunyi — hanya ikon kecil */
+              <Link href="/login" id="nav-admin-login"
+                title="Admin Login"
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  width: 34, height: 34, borderRadius: "50%",
+                  color: "var(--text-muted)", transition: "var(--transition)",
+                  opacity: 0.4
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--primary)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.4"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-muted)"; }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M6 20v-1a6 6 0 0 1 12 0v1" />
+                  <path d="M19 11l2 2-2 2" />
+                  <path d="M21 13h-4" />
+                </svg>
+              </Link>
             )}
 
             {/* Mobile menu toggle */}

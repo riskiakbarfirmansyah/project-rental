@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhyUsFeatures from "@/components/WhyUsFeatures";
+import HeroSection from "@/components/HeroSection";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -29,83 +30,16 @@ export default async function HomePage() {
     // silently fail
   }
 
-  const stats = [
-    { number: config.years_experience || "6+", label: "Tahun Pengalaman", icon: "🏆" },
-    { number: config.total_fleet || "50+", label: "Armada Mobil", icon: "🚗" },
-    { number: config.happy_customers || "5000+", label: "Pelanggan Puas", icon: "😊" },
-    { number: config.service_areas || "20+", label: "Kota Layanan", icon: "📍" },
-  ];
+
 
   return (
     <>
       <Navbar />
 
-      {/* HERO */}
-      <section className="hero">
-        <div className="container" style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ maxWidth: 700 }}>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: "0.5rem",
-              padding: "0.5rem 1.25rem", background: "rgba(255,255,255,0.1)",
-              border: "1px solid rgba(255,255,255,0.2)", borderRadius: "var(--radius-full)",
-              color: "rgba(255,255,255,0.9)", fontSize: "0.875rem", fontWeight: 600,
-              backdropFilter: "blur(10px)", marginBottom: "1.75rem",
-              letterSpacing: "0.04em"
-            }}>
-              ✨ Terpercaya Sejak 2018
-            </div>
-
-            <h1 style={{ color: "white", marginBottom: "1.5rem", lineHeight: 1.15 }}>
-              {config.hero_title || "Sewa Mobil Mudah, Aman & Terpercaya"}
-            </h1>
-            <p style={{
-              fontSize: "1.125rem", color: "rgba(255,255,255,0.75)",
-              lineHeight: 1.8, marginBottom: "2.5rem", maxWidth: 540
-            }}>
-              {config.hero_subtitle || "Tersedia berbagai pilihan armada mobil berkualitas dengan harga terjangkau. Pesan sekarang dan nikmati perjalanan Anda!"}
-            </p>
-
-            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-              <a href="/services" className="btn btn-secondary btn-lg" id="hero-cta-services">
-                🚗 Lihat Armada
-              </a>
-              <a href="/contact" className="btn btn-ghost btn-lg" id="hero-cta-contact">
-                📞 Hubungi Kami
-              </a>
-            </div>
-
-            {/* Stats bar */}
-            <div style={{
-              display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem",
-              marginTop: "4rem", paddingTop: "2.5rem",
-              borderTop: "1px solid rgba(255,255,255,0.15)"
-            }}>
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <div style={{ fontSize: "1.875rem", fontFamily: "Sora, sans-serif", fontWeight: 800, color: "var(--secondary)" }}>
-                    {s.number}
-                  </div>
-                  <div style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.6)", marginTop: "0.25rem" }}>
-                    {s.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Decorative float element */}
-        <div style={{
-          position: "absolute", right: "8%", top: "50%", transform: "translateY(-50%)",
-          width: 380, height: 380, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(245,158,11,0.15) 0%, rgba(26,86,219,0.1) 60%, transparent 80%)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "12rem", animation: "float 4s ease-in-out infinite",
-          pointerEvents: "none"
-        }}>
-          🚙
-        </div>
-      </section>
+      <HeroSection
+        heroTitle={config.hero_title}
+        heroSubtitle={config.hero_subtitle}
+      />
 
       {/* FEATURED CARS */}
       <section className="section" style={{ background: "var(--bg)" }}>

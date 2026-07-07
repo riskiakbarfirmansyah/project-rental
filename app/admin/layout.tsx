@@ -11,7 +11,6 @@ const navItems = [
   { href: "/admin/blog", label: "Blog", icon: "📝" },
   { href: "/admin/gallery", label: "Galeri", icon: "🖼️" },
   { href: "/admin/faq", label: "FAQ", icon: "❓" },
-  { href: "/admin/contact", label: "Pesan Masuk", icon: "📨" },
   { href: "/admin/config", label: "Konfigurasi", icon: "⚙️" },
 ];
 
@@ -46,11 +45,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 width: "80px",
                 height: "auto",
                 objectFit: "contain",
-                filter: "brightness(0) invert(1)",
+                filter: "grayscale(100%) brightness(0)",
               }}
             />
           </Link>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", marginTop: "0.25rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.7rem", marginTop: "0.25rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
             Admin Panel
           </p>
         </div>
@@ -71,13 +70,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div style={{ padding: "1rem 0.75rem", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.9rem", borderRadius: "var(--radius-md)", transition: "var(--transition)" }}
-            id="admin-nav-front">
+        <div style={{ padding: "1rem 0.75rem", borderTop: "1px solid var(--border)" }}>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", color: "var(--text-secondary)", fontSize: "0.9rem", borderRadius: "var(--radius-md)", transition: "var(--transition)", fontWeight: 500 }}
+            id="admin-nav-front"
+            className="admin-nav-item-bottom">
             🌐 Lihat Website
           </Link>
           <button onClick={handleLogout} id="admin-logout"
-            style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", color: "rgba(239,68,68,0.8)", background: "none", border: "none", cursor: "pointer", fontSize: "0.9rem", fontFamily: "inherit", borderRadius: "var(--radius-md)", transition: "var(--transition)" }}>
+            className="admin-nav-item-bottom"
+            style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", color: "var(--error)", background: "none", border: "none", cursor: "pointer", fontSize: "0.9rem", fontFamily: "inherit", borderRadius: "var(--radius-md)", transition: "var(--transition)", fontWeight: 600 }}>
             🚪 Keluar
           </button>
         </div>
