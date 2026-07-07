@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -28,8 +29,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className="admin-sidebar">
         <div className="admin-sidebar-brand">
-          <Link href="/" style={{ fontFamily: "Sora, sans-serif", fontSize: "1.25rem", fontWeight: 800, color: "white", textDecoration: "none" }}>
-            🚗 RentalKu
+          <Link
+            href="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
+            <Image
+              src="/images/logo-no-bg.png"
+              alt="Bella Belly Trans Co"
+              width={180}
+              height={62}
+              style={{
+                width: "80px",
+                height: "auto",
+                objectFit: "contain",
+                filter: "brightness(0) invert(1)",
+              }}
+            />
           </Link>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", marginTop: "0.25rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
             Admin Panel

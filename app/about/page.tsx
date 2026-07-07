@@ -17,6 +17,14 @@ export default async function AboutPage() {
     { name: "Ahmad Fauzi", role: "Customer Service", emoji: "🤝", desc: "Siap membantu 24/7 untuk kebutuhan Anda." },
   ];
 
+  const missionPoints = (
+    config.about_mission ||
+    "Memberikan pelayanan terbaik (unit, customer service, administrasi) * Keamanan, kenyamanan, keselamatan berkendara dan kepuasan pelanggan prioritas kami * Siap menerima masukan & melakukan perubahan ke arah yang lebih baik"
+  )
+    .split("*")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
   return (
     <>
       <Navbar />
@@ -51,43 +59,97 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Vision Mission */}
+      {/* Vision & Mission */}
       <section className="section" style={{ background: "var(--bg)" }}>
         <div className="container">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
-            <div>
-              <span className="section-label">Visi & Misi</span>
-              <h2 style={{ margin: "1rem 0 1.5rem" }}>Komitmen Kami untuk Anda</h2>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.8, marginBottom: "2rem" }}>
-                {config.about_description || "Kami berkomitmen memberikan layanan rental mobil terbaik di Indonesia dengan standar keamanan dan kenyamanan tertinggi."}
-              </p>
+          {/* Header */}
+          <div className="section-header">
+            <span className="section-label">Visi &amp; Misi</span>
+            <h2 className="section-title">Komitmen Kami untuk Anda</h2>
+            <p className="section-subtitle">
+              {config.about_description || "Kami berkomitmen memberikan layanan rental mobil terbaik di Indonesia dengan standar keamanan dan kenyamanan tertinggi."}
+            </p>
+          </div>
 
-              <div style={{ padding: "1.5rem", background: "var(--primary-light)", borderRadius: "var(--radius-lg)", borderLeft: "4px solid var(--primary)" }}>
-                <h4 style={{ color: "var(--primary)", marginBottom: "0.75rem" }}>🎯 Visi Kami</h4>
-                <p style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
-                  {config.about_vision || "Menjadi perusahaan rental mobil terdepan yang mengutamakan kepuasan dan keselamatan pelanggan."}
-                </p>
+          {/* Visi & Misi Cards — side by side */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", alignItems: "stretch" }}>
+
+            {/* Visi Card */}
+            <div style={{
+              padding: "2rem",
+              background: "var(--primary-light)",
+              borderRadius: "var(--radius-xl)",
+              borderTop: "4px solid var(--primary)",
+              borderRight: "1px solid rgba(99,102,241,0.2)",
+              borderBottom: "1px solid rgba(99,102,241,0.2)",
+              borderLeft: "1px solid rgba(99,102,241,0.2)",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: "var(--radius-lg)",
+                  background: "var(--primary)", display: "flex", alignItems: "center",
+                  justifyContent: "center", fontSize: "1.25rem", flexShrink: 0,
+                }}>🎯</div>
+                <h3 style={{ color: "var(--primary)", fontSize: "1.25rem", margin: 0 }}>Visi Kami</h3>
               </div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.8, margin: 0 }}>
+                {config.about_vision || "Menjadi perusahaan rental mobil terdepan yang mengutamakan kepuasan dan keselamatan pelanggan."}
+              </p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              {[
-                { icon: "🛡️", title: "Keamanan", desc: "Armada berstandar keamanan tinggi" },
-                { icon: "⭐", title: "Kualitas", desc: "Perawatan rutin setiap bulan" },
-                { icon: "💎", title: "Premium", desc: "Pengalaman berkendara mewah" },
-                { icon: "🤝", title: "Kepercayaan", desc: "5000+ pelanggan puas" },
-              ].map((v) => (
-                <div key={v.title} style={{
-                  padding: "1.5rem", borderRadius: "var(--radius-lg)",
-                  background: "var(--surface)", border: "1px solid var(--border)",
-                  textAlign: "center", transition: "var(--transition)"
-                }}>
-                  <div style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>{v.icon}</div>
-                  <div style={{ fontWeight: 700, marginBottom: "0.5rem" }}>{v.title}</div>
-                  <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>{v.desc}</div>
-                </div>
-              ))}
+            {/* Misi Card */}
+            <div style={{
+              padding: "2rem",
+              background: "rgba(16,185,129,0.06)",
+              borderRadius: "var(--radius-xl)",
+              borderTop: "4px solid #10b981",
+              borderRight: "1px solid rgba(16,185,129,0.2)",
+              borderBottom: "1px solid rgba(16,185,129,0.2)",
+              borderLeft: "1px solid rgba(16,185,129,0.2)",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: "var(--radius-lg)",
+                  background: "#10b981", display: "flex", alignItems: "center",
+                  justifyContent: "center", fontSize: "1.25rem", flexShrink: 0,
+                }}>🚀</div>
+                <h3 style={{ color: "#10b981", fontSize: "1.25rem", margin: 0 }}>Misi Kami</h3>
+              </div>
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+                {missionPoints.map((point, i) => (
+                  <li key={i} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
+                    <span style={{
+                      width: 22, height: 22, borderRadius: "50%",
+                      background: "#10b981", display: "flex", alignItems: "center",
+                      justifyContent: "center", flexShrink: 0,
+                      fontSize: "0.7rem", color: "white", fontWeight: 700,
+                      marginTop: "0.2rem",
+                    }}>✓</span>
+                    <span style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>{point}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
+          </div>
+
+          {/* Value Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginTop: "2.5rem" }}>
+            {[
+              { icon: "🛡️", title: "Keamanan", desc: "Armada berstandar keamanan tinggi" },
+              { icon: "⭐", title: "Kualitas", desc: "Perawatan rutin setiap bulan" },
+              { icon: "💎", title: "Premium", desc: "Pengalaman berkendara mewah" },
+              { icon: "🤝", title: "Kepercayaan", desc: "5000+ pelanggan puas" },
+            ].map((v) => (
+              <div key={v.title} style={{
+                padding: "1.5rem", borderRadius: "var(--radius-lg)",
+                background: "var(--surface)", border: "1px solid var(--border)",
+                textAlign: "center", transition: "var(--transition)",
+              }}>
+                <div style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>{v.icon}</div>
+                <div style={{ fontWeight: 700, marginBottom: "0.5rem" }}>{v.title}</div>
+                <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>{v.desc}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

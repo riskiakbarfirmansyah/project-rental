@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -52,9 +53,24 @@ export default function Navbar() {
     <nav className="navbar" style={{ boxShadow: scrolled ? "var(--shadow-md)" : "none" }}>
       <div className="container">
         <div className="navbar-inner">
-          <Link href="/" className="navbar-brand" id="navbar-brand">
-            <span style={{ fontSize: "1.5rem" }}>🚗</span>
-            Rental<span className="brand-dot">Ku</span>
+          <Link
+            href="/"
+            className="navbar-brand"
+            id="navbar-brand"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <Image
+              src="/images/logo-no-bg.png"
+              alt="Bella Belly Trans Co"
+              width={180}
+              height={62}
+              priority
+              style={{
+                width: "170px",
+                height: "auto",
+                objectFit: "contain",
+              }}
+            />
           </Link>
 
           {/* Desktop links */}

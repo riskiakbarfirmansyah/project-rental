@@ -16,6 +16,7 @@ const CONFIG_FIELDS = [
     { key: "about_title", label: "Judul Halaman About", type: "text" },
     { key: "about_description", label: "Deskripsi Perusahaan", type: "textarea" },
     { key: "about_vision", label: "Visi Perusahaan", type: "textarea" },
+    { key: "about_mission", label: "Misi Perusahaan", type: "textarea" },
   ]},
   { section: "Kontak & Sosial Media", fields: [
     { key: "contact_phone", label: "Nomor Telepon", type: "text" },

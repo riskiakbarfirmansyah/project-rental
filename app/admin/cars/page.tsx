@@ -13,7 +13,11 @@ const TRANSMISSIONS = ["MANUAL", "AUTOMATIC"];
 const FUELS = ["BENSIN", "DIESEL", "ELECTRIC", "HYBRID"];
 const TYPE_LABELS: Record<string, string> = { SEDAN: "Sedan", SUV: "SUV", MPV: "MPV", PICKUP: "Pickup", MINIBUS: "Minibus", SPORT: "Sport" };
 
-const EMPTY_FORM = { name: "", brand: "", year: 2023, type: "SUV", pricePerDay: 0, seats: 5, transmission: "AUTOMATIC", fuel: "BENSIN", description: "", features: "", imageUrl: "", isAvailable: true };
+const EMPTY_FORM = {
+  name: "", brand: "", year: "2023", type: "SUV", pricePerDay: "0", seats: "5",
+  transmission: "AUTOMATIC", fuel: "BENSIN", description: "", features: "",
+  imageUrl: "", isAvailable: true,
+};
 
 export default function AdminCarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -41,8 +45,8 @@ export default function AdminCarsPage() {
     setEditing(car);
     const features: string[] = (() => { try { return JSON.parse(car.features); } catch { return []; } })();
     setForm({
-      name: car.name, brand: car.brand, year: car.year, type: car.type,
-      pricePerDay: car.pricePerDay, seats: car.seats, transmission: car.transmission,
+      name: car.name, brand: car.brand, year: String(car.year), type: car.type,
+      pricePerDay: String(car.pricePerDay), seats: String(car.seats), transmission: car.transmission,
       fuel: car.fuel, description: car.description, features: features.join(", "),
       imageUrl: car.imageUrl || "", isAvailable: car.isAvailable,
     });
@@ -67,9 +71,9 @@ export default function AdminCarsPage() {
     setSubmitting(true); setError("");
     const payload = {
       ...form,
-      year: parseInt(form.year.toString()),
-      pricePerDay: parseInt(form.pricePerDay.toString()),
-      seats: parseInt(form.seats.toString()),
+      year: parseInt(String(form.year)) || 2023,
+      pricePerDay: parseInt(String(form.pricePerDay)) || 0,
+      seats: parseInt(String(form.seats)) || 1,
       features: form.features.split(",").map((f) => f.trim()).filter(Boolean),
       images: [],
     };
@@ -176,7 +180,7 @@ export default function AdminCarsPage() {
                   </div>
                   <div className="form-group">
                     <label className="form-label" htmlFor="car-year">Tahun *</label>
-                    <input id="car-year" type="number" className="form-control" value={form.year} onChange={(e) => setForm({ ...form, year: parseInt(e.target.value) })} min={1990} max={2026} required />
+                    <input id="car-year" type="number" className="form-control" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} min={1990} max={2026} required />
                   </div>
                   <div className="form-group">
                     <label className="form-label" htmlFor="car-type">Tipe *</label>
@@ -186,11 +190,11 @@ export default function AdminCarsPage() {
                   </div>
                   <div className="form-group">
                     <label className="form-label" htmlFor="car-price">Harga/Hari (Rp) *</label>
-                    <input id="car-price" type="number" className="form-control" value={form.pricePerDay} onChange={(e) => setForm({ ...form, pricePerDay: parseInt(e.target.value) })} min={0} required />
+                    <input id="car-price" type="number" className="form-control" value={form.pricePerDay} onChange={(e) => setForm({ ...form, pricePerDay: e.target.value })} min={0} required />
                   </div>
                   <div className="form-group">
                     <label className="form-label" htmlFor="car-seats">Kapasitas (kursi) *</label>
-                    <input id="car-seats" type="number" className="form-control" value={form.seats} onChange={(e) => setForm({ ...form, seats: parseInt(e.target.value) })} min={1} max={20} required />
+                    <input id="car-seats" type="number" className="form-control" value={form.seats} onChange={(e) => setForm({ ...form, seats: e.target.value })} min={1} max={20} required />
                   </div>
                   <div className="form-group">
                     <label className="form-label" htmlFor="car-transmission">Transmisi *</label>
