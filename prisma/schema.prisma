@@ -80,6 +80,8 @@ model Car {
   bookings     Booking[]
   galleryItems GalleryItem[]
 
+  @@index([isAvailable])
+  @@index([createdAt])
   @@map("cars")
 }
 
@@ -109,6 +111,8 @@ model Booking {
 
   car Car @relation(fields: [carId], references: [id], onDelete: Cascade)
 
+  @@index([status])
+  @@index([createdAt])
   @@map("bookings")
 }
 
@@ -126,6 +130,7 @@ model BlogPost {
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
+  @@index([isPublished])
   @@map("blog_posts")
 }
 
@@ -151,6 +156,7 @@ model FaqItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([isActive])
   @@map("faq_items")
 }
 

@@ -15,6 +15,27 @@ interface AdminContact {
   wa: string;
 }
 
+const copyToClipboard = (text: string): Promise<void> => {
+  if (typeof window === "undefined") return Promise.resolve();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text);
+  }
+  // Fallback for non-secure contexts
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand("copy");
+  } catch (err) {
+    console.warn("Fallback copy failed", err);
+  }
+  document.body.removeChild(textarea);
+  return Promise.resolve();
+};
+
 export default function BookingPage({ params }: { params: Promise<{ carId: string }> }) {
   const { carId } = use(params);
   const [car, setCar] = useState<Car | null>(null);
@@ -31,6 +52,9 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [successBookingId, setSuccessBookingId] = useState("");
+  const [successWaUrl, setSuccessWaUrl] = useState("");
+  const [copied, setCopied] = useState(false);
   const [form, setForm] = useState({
     customerName: "",
     customerWa: "",
@@ -132,6 +156,8 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
       ].join("\n");
 
       const waUrl = `https://wa.me/${adminWa}?text=${encodeURIComponent(msg)}`;
+      setSuccessBookingId(bookingId);
+      setSuccessWaUrl(waUrl);
       window.open(waUrl, "_blank");
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan koneksi");
@@ -504,6 +530,129 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
           </div>
         </div>
       </section>
+
+      {/* Success Modal */}
+      {successBookingId && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(10, 10, 10, 0.4)", backdropFilter: "blur(8px)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 9999, padding: "1.5rem"
+        }}>
+          <div style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "24px",
+            boxShadow: "var(--shadow-xl)",
+            width: "100%", maxWidth: "480px",
+            padding: "2rem", display: "flex", flexDirection: "column",
+            alignItems: "center", textAlign: "center", gap: "1.25rem",
+            animation: "modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
+          }}>
+            <div style={{
+              width: "64px", height: "64px", borderRadius: "50%",
+              background: "rgba(16, 185, 129, 0.1)", color: "#10b981",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "2rem"
+            }}>
+              ✓
+            </div>
+            
+            <div>
+              <h3 style={{ fontFamily: "Sora, sans-serif", fontWeight: 800, fontSize: "1.25rem", marginBottom: "0.5rem" }}>
+                Pemesanan Berhasil Disimpan!
+              </h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", lineHeight: 1.5 }}>
+                Silakan salin ID Booking Anda dan klik tombol di bawah untuk melanjutkan pengiriman detail via WhatsApp ke admin kami.
+              </p>
+            </div>
+
+            {/* Booking ID box */}
+            <div style={{
+              width: "100%", background: "var(--surface-2)", border: "1px solid var(--border)",
+              borderRadius: "14px", padding: "0.875rem 1.125rem", display: "flex",
+              alignItems: "center", justifyContent: "space-between", gap: "1rem"
+            }}>
+              <span style={{ fontFamily: "monospace", fontSize: "0.875rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                {successBookingId}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  copyToClipboard(successBookingId).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  });
+                }}
+                style={{
+                  background: copied ? "rgba(16, 185, 129, 0.1)" : "var(--surface)",
+                  border: `1px solid ${copied ? "#10b981" : "var(--border)"}`,
+                  color: copied ? "#10b981" : "var(--text-primary)",
+                  borderRadius: "8px", padding: "0.35rem 0.75rem", fontSize: "0.75rem",
+                  fontWeight: 600, cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                {copied ? "✓ Disalin" : "📋 Salin"}
+              </button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", width: "100%", marginTop: "0.5rem" }}>
+              <a
+                href={successWaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setSuccessBookingId("");
+                  setSuccessWaUrl("");
+                  setForm({
+                    customerName: "",
+                    customerWa: "",
+                    pickupDate: "",
+                    duration: "1",
+                    pickupLocation: "",
+                    driverOption: "lepas_kunci"
+                  });
+                }}
+                style={{
+                  background: "#16a34a", color: "white", padding: "0.75rem 1.5rem",
+                  borderRadius: "10px", textDecoration: "none", fontWeight: 700,
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  gap: "0.5rem", width: "100%", cursor: "pointer"
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
+                </svg>
+                Hubungi via WhatsApp
+              </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setSuccessBookingId("");
+                  setSuccessWaUrl("");
+                  setForm({
+                    customerName: "",
+                    customerWa: "",
+                    pickupDate: "",
+                    duration: "1",
+                    pickupLocation: "",
+                    driverOption: "lepas_kunci"
+                  });
+                }}
+                style={{
+                  background: "transparent", border: "1px solid var(--border)",
+                  borderRadius: "10px", padding: "0.75rem 1.5rem", fontSize: "0.875rem",
+                  fontWeight: 600, cursor: "pointer", color: "var(--text-secondary)"
+                }}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </>
