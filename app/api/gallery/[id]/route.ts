@@ -15,7 +15,7 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const parsed = gallerySchema.partial().safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const item = await prisma.galleryItem.update({ where: { id }, data: parsed.data });
     return successResponse({ item });

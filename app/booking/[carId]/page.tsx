@@ -10,11 +10,27 @@ interface Car {
   description: string; features: string; imageUrl?: string;
 }
 
+interface AdminContact {
+  label: string;
+  wa: string;
+}
+
 export default function BookingPage({ params }: { params: Promise<{ carId: string }> }) {
   const { carId } = use(params);
   const [car, setCar] = useState<Car | null>(null);
-  const [adminWa, setAdminWa] = useState("6281234567890");
+
+  // Admin 1 diambil dari config (bisa diubah dari admin panel), Admin 2 fixed
+  const [admins, setAdmins] = useState<AdminContact[]>([
+    { label: "Admin 1", wa: "6281234567890" },
+    { label: "Admin 2", wa: "62895633818676" },
+    { label: "Admin 3", wa: "6285640802650" },
+  ]);
+  const [selectedAdminIdx, setSelectedAdminIdx] = useState(0);
+  const adminWa = admins[selectedAdminIdx]?.wa || admins[0].wa;
+
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     customerName: "",
     customerWa: "",
@@ -31,7 +47,13 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
     ]).then(([carData, cfgData]) => {
       if (carData.success) setCar(carData.data.car);
       const wa = cfgData.data?.config?.whatsapp;
-      if (wa) setAdminWa(wa.replace(/[^0-9]/g, ""));
+      if (wa) {
+        setAdmins((prev) => {
+          const updated = [...prev];
+          updated[0] = { ...updated[0], wa: wa.replace(/[^0-9]/g, "") };
+          return updated;
+        });
+      }
     }).finally(() => setLoading(false));
   }, [carId]);
 
@@ -51,36 +73,71 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
     ? new Date(form.pickupDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
     : "-";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!car) return;
+    setSubmitting(true);
+    setError("");
 
-    const msg = [
-      `🚗 *PEMESANAN SEWA MOBIL*`,
-      `━━━━━━━━━━━━━━━━━━━━`,
-      ``,
-      `*Kendaraan:* ${car.brand} ${car.name} (${car.year})`,
-      `*Tipe:* ${car.type}`,
-      ``,
-      `*Detail Pemesan:*`,
-      `👤 Nama: ${form.customerName}`,
-      `📱 WhatsApp: ${form.customerWa}`,
-      ``,
-      `*Detail Sewa:*`,
-      `📅 Tanggal Ambil: ${pickupDateFormatted}`,
-      `⏱ Durasi: ${duration} hari`,
-      `🏁 Estimasi Selesai: ${endDate}`,
-      `📍 Lokasi Penjemputan: ${form.pickupLocation}`,
-      `🔑 Pilihan: ${form.driverOption === "lepas_kunci" ? "Lepas Kunci (tanpa supir)" : "Dengan Supir"}`,
-      ``,
-      `💰 *Estimasi Biaya:* Rp ${totalPrice.toLocaleString("id-ID")}`,
-      `(Rp ${car.pricePerDay.toLocaleString("id-ID")}/hari × ${duration} hari)`,
-      ``,
-      `Mohon konfirmasi ketersediaan. Terima kasih! 🙏`,
-    ].join("\n");
+    try {
+      const payload = {
+        carId: car.id,
+        customerName: form.customerName,
+        customerWa: form.customerWa,
+        pickupDate: form.pickupDate,
+        duration: parseInt(form.duration) || 1,
+        pickupLocation: form.pickupLocation,
+        driverOption: form.driverOption,
+        selectedAdminName: admins[selectedAdminIdx]?.label || "Admin",
+        selectedAdminWa: adminWa,
+        customerNote: "",
+      };
 
-    const waUrl = `https://wa.me/${adminWa}?text=${encodeURIComponent(msg)}`;
-    window.open(waUrl, "_blank");
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Gagal menyimpan pesanan ke database");
+      }
+
+      const bookingId = data.data.booking.id;
+
+      const msg = [
+        `🚗 *PEMESANAN SEWA MOBIL*`,
+        `━━━━━━━━━━━━━━━━━━━━`,
+        `*ID Booking:* ${bookingId}`,
+        ``,
+        `*Kendaraan:* ${car.brand} ${car.name} (${car.year})`,
+        `*Tipe:* ${car.type}`,
+        ``,
+        `*Detail Pemesan:*`,
+        `👤 Nama: ${form.customerName}`,
+        `📱 WhatsApp: ${form.customerWa}`,
+        ``,
+        `*Detail Sewa:*`,
+        `📅 Tanggal Ambil: ${pickupDateFormatted}`,
+        `⏱ Durasi: ${duration} hari`,
+        `🏁 Estimasi Selesai: ${endDate}`,
+        `📍 Lokasi Penjemputan: ${form.pickupLocation}`,
+        `🔑 Pilihan: ${form.driverOption === "lepas_kunci" ? "Lepas Kunci (tanpa supir)" : "Dengan Supir"}`,
+        ``,
+        `💰 *Estimasi Biaya:* Rp ${totalPrice.toLocaleString("id-ID")}`,
+        `(Rp ${car.pricePerDay.toLocaleString("id-ID")}/hari × ${duration} hari)`,
+        ``,
+        `Mohon konfirmasi ketersediaan. Terima kasih! 🙏`,
+      ].join("\n");
+
+      const waUrl = `https://wa.me/${adminWa}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, "_blank");
+    } catch (err: any) {
+      setError(err.message || "Terjadi kesalahan koneksi");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const today = new Date().toISOString().split("T")[0];
@@ -176,7 +233,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   </div>
                 )}
 
-                {/* Admin contact */}
+                {/* Admin contact - mengikuti admin yang dipilih di form */}
                 <div style={{
                   marginTop: "1.25rem", padding: "1rem 1.25rem",
                   background: "linear-gradient(135deg, #f0fdf4, #dcfce7)",
@@ -185,7 +242,9 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                 }}>
                   <div style={{ fontSize: "1.5rem" }}>📞</div>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: "0.875rem", color: "#15803d" }}>Hubungi Admin</div>
+                    <div style={{ fontWeight: 700, fontSize: "0.875rem", color: "#15803d" }}>
+                      Hubungi {admins[selectedAdminIdx]?.label}
+                    </div>
                     <div style={{ fontSize: "0.8125rem", color: "#166534" }}>+{adminWa}</div>
                   </div>
                   <a href={`https://wa.me/${adminWa}`} target="_blank" rel="noopener noreferrer"
@@ -224,6 +283,40 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                     Rp {car.pricePerDay.toLocaleString("id-ID")}
                     <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "var(--text-muted)" }}>/hari</span>
                   </span>
+                </div>
+
+                {/* Pilih Admin */}
+                <div className="form-group">
+                  <label className="form-label">
+                    📞 Pilih Admin <span style={{ color: "var(--error)" }}>*</span>
+                  </label>
+                  <div style={{ display: "grid", gridTemplateColumns: `repeat(${admins.length}, 1fr)`, gap: "0.75rem" }}>
+                    {admins.map((a, idx) => (
+                      <label key={a.label} htmlFor={`radio-admin-${idx}`}
+                        style={{
+                          display: "flex", flexDirection: "column", gap: "0.25rem",
+                          padding: "0.875rem 1rem",
+                          border: `2px solid ${selectedAdminIdx === idx ? "var(--primary)" : "var(--border)"}`,
+                          borderRadius: "var(--radius-lg)",
+                          background: selectedAdminIdx === idx ? "var(--primary-light)" : "var(--surface)",
+                          cursor: "pointer", transition: "var(--transition)"
+                        }}
+                      >
+                        <input
+                          type="radio" id={`radio-admin-${idx}`}
+                          name="adminOption" value={a.wa}
+                          checked={selectedAdminIdx === idx}
+                          onChange={() => setSelectedAdminIdx(idx)}
+                          style={{ display: "none" }}
+                        />
+                        <span style={{
+                          fontWeight: 700, fontSize: "0.9375rem",
+                          color: selectedAdminIdx === idx ? "var(--primary-dark)" : "var(--text-primary)"
+                        }}>📞 {a.label}</span>
+                        <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>+{a.wa}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Nama lengkap */}
@@ -359,6 +452,12 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   </div>
                 </div>
 
+                {error && (
+                  <div className="alert alert-error" style={{ marginBottom: "0.5rem" }}>
+                    ⚠️ {error}
+                  </div>
+                )}
+
                 {/* Total Estimasi */}
                 <div style={{
                   padding: "1.25rem", borderRadius: "var(--radius-lg)",
@@ -381,7 +480,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   type="submit"
                   id="booking-submit"
                   className="btn btn-lg"
-                  disabled={!form.pickupDate || !form.customerName || !form.customerWa || !form.pickupLocation}
+                  disabled={submitting || !form.pickupDate || !form.customerName || !form.customerWa || !form.pickupLocation}
                   style={{
                     width: "100%", justifyContent: "center",
                     background: "#16a34a",
@@ -393,7 +492,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
                   </svg>
-                  Kirim Pesanan via WhatsApp
+                  {submitting ? "Menyimpan pesanan..." : "Kirim Pesanan via WhatsApp"}
                 </button>
 
                 <p style={{ textAlign: "center", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.5 }}>

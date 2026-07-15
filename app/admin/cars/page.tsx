@@ -72,15 +72,17 @@ export default function AdminCarsPage() {
     const payload = {
       ...form,
       year: parseInt(String(form.year)) || 2023,
-      pricePerDay: parseInt(String(form.pricePerDay)) || 0,
+      pricePerDay: parseInt(String(form.pricePerDay).replace(/\D/g, "")) || 0,
       seats: parseInt(String(form.seats)) || 1,
-      features: form.features.split(",").map((f) => f.trim()).filter(Boolean),
+      features: form.features ? form.features.split(",").map((f) => f.trim()).filter(Boolean) : [],
       images: [],
     };
+    console.log("[Cars] Submitting payload:", JSON.stringify(payload));
     const url = editing ? `/api/cars/${editing.id}` : "/api/cars";
     const method = editing ? "PUT" : "POST";
     const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     const data = await res.json();
+    console.log("[Cars] API response:", JSON.stringify(data));
     if (data.success) { setShowForm(false); load(); }
     else setError(data.error || "Gagal menyimpan");
     setSubmitting(false);
@@ -210,8 +212,8 @@ export default function AdminCarsPage() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="car-description">Deskripsi *</label>
-                  <textarea id="car-description" className="form-control" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
+                  <label className="form-label" htmlFor="car-description">Deskripsi</label>
+                  <textarea id="car-description" className="form-control" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="car-features">Fitur (pisahkan dengan koma)</label>

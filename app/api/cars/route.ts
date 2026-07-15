@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const parsed = carSchema.safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const { features, images, ...rest } = parsed.data;
     const car = await prisma.car.create({
@@ -71,7 +71,8 @@ export async function POST(request: NextRequest) {
 
     return successResponse({ car }, 201);
   } catch (error) {
-    console.error("Create car error:", error);
-    return errorResponse("Terjadi kesalahan server", 500);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Create car error detail:", msg);
+    return errorResponse(`Terjadi kesalahan server: ${msg}`, 500);
   }
 }

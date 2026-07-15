@@ -3,20 +3,23 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhyUsFeatures from "@/components/WhyUsFeatures";
 import HeroSection from "@/components/HeroSection";
+import ReviewsSection from "@/components/ReviewsSection";
 
 export const metadata: Metadata = {
-  title: "Home",
+  title: "Bella Belly Trans Co",
 };
 
 export default async function HomePage() {
   // Ambil data server-side
   let cars: {id: string; name: string; brand: string; type: string; pricePerDay: number; seats: number; transmission: string; imageUrl?: string}[] = [];
   let config: Record<string, string> = {};
+  let reviews: {id: string; reviewerName: string; reviewerAvatar?: string; rating: number; content: string; source: string; reviewDate?: string}[] = [];
 
   try {
-    const [carsRes, configRes] = await Promise.all([
+    const [carsRes, configRes, reviewsRes] = await Promise.all([
       fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/cars?limit=6&available=true`, { cache: "no-store" }),
       fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/config`, { cache: "no-store" }),
+      fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/reviews`, { cache: "no-store" }),
     ]);
     if (carsRes.ok) {
       const data = await carsRes.json();
@@ -25,6 +28,10 @@ export default async function HomePage() {
     if (configRes.ok) {
       const data = await configRes.json();
       config = data.data?.config || {};
+    }
+    if (reviewsRes.ok) {
+      const data = await reviewsRes.json();
+      reviews = (data.data?.reviews || []).filter((r: {isVisible: boolean}) => r.isVisible);
     }
   } catch {
     // silently fail
@@ -78,7 +85,7 @@ export default async function HomePage() {
         <div className="container">
           <div className="section-header">
             <span className="section-label">Mengapa Kami</span>
-            <h2 className="section-title">Keunggulan RentalKu</h2>
+            <h2 className="section-title">Keunggulan Bella Belly Trans Co</h2>
             <p className="section-subtitle">
               Kami hadir dengan layanan terbaik untuk memastikan perjalanan Anda nyaman dan aman.
             </p>
@@ -97,7 +104,7 @@ export default async function HomePage() {
           position: "absolute", top: "50%", left: "50%",
           transform: "translate(-50%, -50%)",
           width: "80%", height: "200%",
-          background: "radial-gradient(ellipse, rgba(245,158,11,0.1) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(255,255,255,0.05) 0%, transparent 70%)",
           pointerEvents: "none"
         }} />
         <div className="container" style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
@@ -105,19 +112,25 @@ export default async function HomePage() {
             Siap Memulai Perjalanan Anda?
           </h2>
           <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "1.125rem", maxWidth: 500, margin: "0 auto 2.5rem" }}>
-            Pesan sekarang dan dapatkan pengalaman berkendara yang nyaman dan aman bersama RentalKu.
+            Pesan sekarang dan dapatkan pengalaman berkendara yang nyaman dan aman bersama Bella Belly Trans Co.
           </p>
           <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
             <a href="/services" className="btn btn-secondary btn-lg" id="cta-book-now">
               Pesan Sekarang
             </a>
-            <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer"
+            <a href="https://wa.me/6281325485262" target="_blank" rel="noopener noreferrer"
               className="btn btn-ghost btn-lg" id="cta-whatsapp">
               💬 Chat WhatsApp
             </a>
           </div>
         </div>
       </section>
+
+      {/* Reviews & Google Maps */}
+      <ReviewsSection
+        reviews={reviews}
+        mapsEmbedUrl={config.google_maps_embed || undefined}
+      />
 
       <Footer />
     </>

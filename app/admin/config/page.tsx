@@ -26,6 +26,7 @@ const CONFIG_FIELDS = [
     { key: "whatsapp", label: "Nomor WhatsApp (tanpa +)", type: "text" },
     { key: "instagram", label: "Instagram", type: "text" },
     { key: "facebook", label: "Facebook", type: "text" },
+    { key: "google_maps_embed", label: "Google Maps Embed URL (src dari iframe)", type: "textarea" },
   ]},
   { section: "Statistik (Tampilan Home)", fields: [
     { key: "years_experience", label: "Tahun Pengalaman", type: "text" },

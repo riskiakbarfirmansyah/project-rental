@@ -5,7 +5,7 @@ import { successResponse, errorResponse } from "@/lib/utils";
 export async function GET() {
   try {
     const auth = await requireAdmin();
-    if ("error" in auth) return errorResponse(auth.error, auth.status);
+    if ("error" in auth) return errorResponse(auth.error || "Akses ditolak", auth.status);
 
     const [
       totalCars,
@@ -23,14 +23,14 @@ export async function GET() {
       prisma.car.count({ where: { isAvailable: true } }),
       prisma.user.count({ where: { role: "CUSTOMER" } }),
       prisma.booking.count(),
-      prisma.booking.count({ where: { status: "PENDING" } }),
+      prisma.booking.count({ where: { status: "PENDING_CONFIRMATION" } }),
       prisma.booking.count({ where: { status: "CONFIRMED" } }),
       prisma.booking.count({ where: { status: "COMPLETED" } }),
       prisma.booking.count({ where: { status: "CANCELLED" } }),
       prisma.contactMessage.count({ where: { isRead: false } }),
       prisma.booking.aggregate({
         _sum: { totalPrice: true },
-        where: { status: { in: ["COMPLETED", "CONFIRMED", "ONGOING"] } },
+        where: { status: { in: ["COMPLETED", "CONFIRMED"] } },
       }),
     ]);
 
@@ -38,10 +38,6 @@ export async function GET() {
     const recentBookings = await prisma.booking.findMany({
       take: 5,
       orderBy: { createdAt: "desc" },
-      include: {
-        user: { select: { name: true, email: true } },
-        car: { select: { name: true, brand: true } },
-      },
     });
 
     // Monthly revenue (last 6 months)
@@ -51,7 +47,7 @@ export async function GET() {
     const monthlyBookings = await prisma.booking.findMany({
       where: {
         createdAt: { gte: sixMonthsAgo },
-        status: { in: ["COMPLETED", "CONFIRMED", "ONGOING"] },
+        status: { in: ["COMPLETED", "CONFIRMED"] },
       },
       select: { createdAt: true, totalPrice: true },
     });
@@ -75,7 +71,14 @@ export async function GET() {
         unreadMessages,
         totalRevenue: revenueData._sum.totalPrice || 0,
       },
-      recentBookings,
+      recentBookings: recentBookings.map((b) => ({
+        id: b.id,
+        status: b.status,
+        totalPrice: b.totalPrice,
+        createdAt: b.createdAt.toISOString(),
+        user: { name: b.customerName, email: b.customerWa },
+        car: { name: b.carName, brand: b.carBrand },
+      })),
       monthlyRevenue,
     });
   } catch (error) {

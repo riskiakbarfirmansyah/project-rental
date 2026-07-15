@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const parsed = contactSchema.safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const message = await prisma.contactMessage.create({ data: parsed.data });
     return successResponse({ message }, 201);

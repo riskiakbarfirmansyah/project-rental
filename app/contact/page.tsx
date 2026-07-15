@@ -18,15 +18,13 @@ export default async function ContactPage() {
     }
   } catch {}
 
-  const phone    = config.contact_phone    || "+62 812-3456-7890";
-  const email    = config.contact_email    || "info@rentalku.com";
-  const address  = config.contact_address  || "Jl. Sudirman No. 1, Jakarta Pusat";
+  const phone    = config.contact_phone    || "+62 813-2548-5262";
+  const address  = config.contact_address  || "Jl. Sawunggaling Selatan No 48 Semarang";
   const hours    = config.contact_hours    || "Senin – Minggu, 08:00 – 20:00 WIB";
-  const waNumber = (config.whatsapp || "6281234567890").replace(/[^0-9]/g, "");
+  const waNumber = (config.whatsapp || "6281325485262").replace(/[^0-9]/g, "");
 
   const contacts = [
     { icon: "📞", label: "Telepon",          value: phone,   href: `tel:${phone.replace(/\s|-/g, "")}` },
-    { icon: "✉️", label: "Email",            value: email,   href: `mailto:${email}` },
     { icon: "📍", label: "Alamat",           value: address, href: "#" },
     { icon: "🕐", label: "Jam Operasional",  value: hours,   href: "#" },
   ];
@@ -37,7 +35,7 @@ export default async function ContactPage() {
 
       {/* Hero */}
       <section style={{
-        background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)",
+        background: "var(--gradient-hero)",
         padding: "5rem 0 3.5rem", textAlign: "center"
       }}>
         <div className="container">
@@ -82,7 +80,7 @@ export default async function ContactPage() {
                 <div style={{
                   width: 52, height: 52, flexShrink: 0,
                   borderRadius: "var(--radius-md)",
-                  background: "var(--primary-light)",
+                  background: "var(--surface-2)",
                   display: "flex", alignItems: "center",
                   justifyContent: "center", fontSize: "1.375rem"
                 }}>
@@ -107,11 +105,12 @@ export default async function ContactPage() {
           {/* WhatsApp CTA — menonjol */}
           <div style={{
             borderRadius: "var(--radius-2xl)",
-            background: "linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)",
+            background: "linear-gradient(135deg, #171717 0%, #0a0a0a 100%)",
             padding: "3rem 2.5rem",
             display: "flex", flexDirection: "column", alignItems: "center",
             textAlign: "center", gap: "0",
-            position: "relative", overflow: "hidden"
+            position: "relative", overflow: "hidden",
+            boxShadow: "var(--shadow-lg)"
           }}>
             {/* dekorasi lingkaran */}
             <div style={{
@@ -154,7 +153,7 @@ export default async function ContactPage() {
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "0.625rem",
                   padding: "0.9rem 2.25rem",
-                  background: "white", color: "#065f46",
+                  background: "white", color: "#15803d",
                   borderRadius: "var(--radius-full)",
                   fontWeight: 800, fontSize: "1rem",
                   textDecoration: "none", transition: "var(--transition)",

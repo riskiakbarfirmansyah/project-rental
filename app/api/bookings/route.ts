@@ -1,31 +1,41 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bookingSchema } from "@/lib/validations";
-import { requireAuth, getAuthUser } from "@/lib/auth";
-import { successResponse, errorResponse, calculateDays } from "@/lib/utils";
+import { requireAdmin } from "@/lib/auth";
+import { successResponse, errorResponse } from "@/lib/utils";
 
+// GET /api/bookings - Get all bookings for admin
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthUser();
-    if (!user) return errorResponse("Unauthorized", 401);
+    const auth = await requireAdmin();
+    if ("error" in auth) return errorResponse(auth.error || "Akses ditolak", auth.status);
 
     const { searchParams } = request.nextUrl;
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
+    
     const status = searchParams.get("status");
+    const search = searchParams.get("search");
 
-    const where: Record<string, unknown> = {};
-    if (user.role !== "ADMIN") where.userId = user.id;
-    if (status) where.status = status;
+    const where: any = {};
+    
+    if (status && status !== "ALL") {
+      where.status = status;
+    }
+    
+    if (search) {
+      where.OR = [
+        { customerName: { contains: search } },
+        { customerWa: { contains: search } },
+        { carName: { contains: search } },
+        { carBrand: { contains: search } }
+      ];
+    }
 
     const [bookings, total] = await Promise.all([
       prisma.booking.findMany({
         where,
-        include: {
-          user: { select: { id: true, name: true, email: true, phone: true } },
-          car: { select: { id: true, name: true, brand: true, imageUrl: true, pricePerDay: true } },
-        },
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -35,7 +45,12 @@ export async function GET(request: NextRequest) {
 
     return successResponse({
       bookings,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error("Get bookings error:", error);
@@ -43,53 +58,62 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/bookings - Create new booking from customer form
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireAuth();
-    if ("error" in auth) return errorResponse(auth.error, auth.status);
-
     const body = await request.json();
     const parsed = bookingSchema.safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) {
+      return errorResponse(parsed.error.issues[0].message);
+    }
 
-    const { carId, startDate, endDate, pickupLocation, notes } = parsed.data;
+    const {
+      carId,
+      customerName,
+      customerWa,
+      pickupDate,
+      duration,
+      pickupLocation,
+      driverOption,
+      selectedAdminName,
+      selectedAdminWa,
+      customerNote,
+    } = parsed.data;
 
+    // Fetch car details
     const car = await prisma.car.findUnique({ where: { id: carId } });
-    if (!car) return errorResponse("Mobil tidak ditemukan", 404);
-    if (!car.isAvailable) return errorResponse("Mobil tidak tersedia", 400);
+    if (!car) {
+      return errorResponse("Mobil tidak ditemukan", 404);
+    }
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    if (end <= start) return errorResponse("Tanggal selesai harus setelah tanggal mulai");
+    const pricePerDay = car.pricePerDay;
+    const totalPrice = pricePerDay * duration;
 
-    const totalDays = calculateDays(startDate, endDate);
-    const totalPrice = totalDays * car.pricePerDay;
-
-    // Check for conflicting bookings
-    const conflict = await prisma.booking.findFirst({
-      where: {
-        carId,
-        status: { in: ["CONFIRMED", "ONGOING"] },
-        OR: [
-          { startDate: { lte: end }, endDate: { gte: start } },
-        ],
-      },
-    });
-    if (conflict) return errorResponse("Mobil sudah dibooking pada tanggal tersebut", 409);
+    // Calculate end date
+    const start = new Date(pickupDate);
+    const end = new Date(start);
+    end.setDate(end.getDate() + duration);
 
     const booking = await prisma.booking.create({
       data: {
-        userId: auth.user.id,
         carId,
-        startDate: start,
+        carName: car.name,
+        carBrand: car.brand,
+        carYear: car.year,
+        carType: car.type,
+        customerName,
+        customerWa,
+        pickupDate: start,
+        duration,
         endDate: end,
-        totalDays,
-        totalPrice,
         pickupLocation,
-        notes,
-      },
-      include: {
-        car: { select: { name: true, brand: true, imageUrl: true } },
+        driverOption,
+        selectedAdminName,
+        selectedAdminWa,
+        pricePerDay,
+        totalPrice,
+        customerNote: customerNote || null,
+        status: "PENDING_CONFIRMATION",
       },
     });
 

@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const parsed = blogSchema.safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const { title, slug, ...rest } = parsed.data;
     const finalSlug = slug || generateSlug(title);

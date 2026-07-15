@@ -1,13 +1,33 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const [config, setConfig] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) setConfig(d.data.config || {});
+      })
+      .catch(() => {});
+  }, []);
+
+  const waNumber = (config.whatsapp || "6281325485262").replace(/[^0-9]/g, "");
+  const instagramVal = config.instagram || "@bellabellyrentalmobilsmg";
+  const tiktokVal = config.TikTok || "@bellabellyrentalmobilsmg";
+
+  const instagramUser = instagramVal.trim().replace("@", "");
+  const tiktokUser = tiktokVal.trim().startsWith("@") ? tiktokVal.trim() : `@${tiktokVal.trim()}`;
 
   const socialLinks = [
-    { icon: "📱", label: "WhatsApp", href: "https://wa.me/6281234567890" },
-    { icon: "📸", label: "Instagram", href: "#" },
-    { icon: "👥", label: "Facebook", href: "#" },
+    { icon: "📱", label: "WhatsApp", href: `https://wa.me/${waNumber}` },
+    { icon: "📸", label: "Instagram", href: `https://www.instagram.com/${instagramUser}/` },
+    { icon: "🎵", label: "TikTok", href: `https://www.tiktok.com/${tiktokUser}` },
   ];
 
   const navigationLinks = [
@@ -32,16 +52,17 @@ export default function Footer() {
         <div className="footer-grid">
           {/* Brand */}
           <div className="footer-main">
-            <div className="footer-brand">
+            <div className="footer-brand" style={{ marginBottom: "0.75rem" }}>
               <Image
                 src="/images/logo-no-bg.png"
                 alt="Bella Belly Trans Co"
                 width={180}
                 height={62}
                 className="footer-logo"
+                style={{ display: "block" }}
               />
             </div>
-            <p className="footer-description">
+            <p className="footer-description" style={{ marginTop: 0, marginBottom: "1rem" }}>
               Layanan sewa mobil terpercaya dengan armada lengkap dan harga
               terjangkau. Siap melayani perjalanan bisnis dan wisata Anda.
             </p>
@@ -89,10 +110,9 @@ export default function Footer() {
           <div className="footer-column">
             <h4>Kontak</h4>
             <div className="footer-contact">
-              <p>📞 +62 812-3456-7890</p>
-              <p>✉️ info@rentalku.com</p>
-              <p>📍 Jl. Sudirman No. 1, Jakarta</p>
-              <p>🕐 Senin - Minggu, 08:00 - 20:00</p>
+              <p>📞 {config.contact_phone || "+62 813-2548-5262"}</p>
+              <p>📍 {config.contact_address || "Jl. Sawunggaling Selatan No 48 Semarang"}</p>
+              <p>🕐 {config.contact_hours || "Senin - Minggu, 08:00 - 20:00 WIB"}</p>
             </div>
           </div>
         </div>

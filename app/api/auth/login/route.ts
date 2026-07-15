@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const parsed = loginSchema.safeParse(body);
 
     if (!parsed.success) {
-      return errorResponse(parsed.error.errors[0].message);
+      return errorResponse(parsed.error.issues[0].message);
     }
 
     const { email, password } = parsed.data;

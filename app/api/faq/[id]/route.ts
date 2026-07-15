@@ -15,7 +15,7 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const parsed = faqSchema.partial().safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const faq = await prisma.faqItem.update({ where: { id }, data: parsed.data });
     return successResponse({ faq });

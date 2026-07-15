@@ -7,6 +7,7 @@ const secret = new TextEncoder().encode(
 );
 
 export interface JwtPayload {
+  [key: string]: unknown;
   userId: string;
   email: string;
   role: string;

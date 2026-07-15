@@ -11,11 +11,6 @@ export default async function AboutPage() {
     if (res.ok) { const d = await res.json(); config = d.data?.config || {}; }
   } catch {}
 
-  const team = [
-    { name: "Budi Prasetyo", role: "Founder & CEO", emoji: "👨‍💼", desc: "Lebih dari 15 tahun di industri transportasi." },
-    { name: "Siti Rahma", role: "Operations Manager", emoji: "👩‍💻", desc: "Memastikan setiap armada dalam kondisi prima." },
-    { name: "Ahmad Fauzi", role: "Customer Service", emoji: "🤝", desc: "Siap membantu 24/7 untuk kebutuhan Anda." },
-  ];
 
   const missionPoints = (
     config.about_mission ||
@@ -36,7 +31,7 @@ export default async function AboutPage() {
       }}>
         <div style={{
           position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse at 70% 50%, rgba(26,86,219,0.3) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse at 70% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)",
           pointerEvents: "none"
         }} />
         <div className="container" style={{ position: "relative", zIndex: 1 }}>
@@ -50,10 +45,10 @@ export default async function AboutPage() {
               🏆 Tentang Kami
             </div>
             <h1 style={{ color: "white", marginBottom: "1.25rem" }}>
-              {config.about_title || "Tentang RentalKu"}
+              {config.about_title || "Tentang Bella Belly Trans Co"}
             </h1>
             <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "1.125rem", lineHeight: 1.8 }}>
-              {config.about_description || "RentalKu hadir sejak 2018 sebagai penyedia layanan sewa mobil terpercaya."}
+              {config.about_description || "Bella Belly Trans Co hadir sebagai penyedia layanan sewa mobil terpercaya."}
             </p>
           </div>
         </div>
@@ -67,7 +62,7 @@ export default async function AboutPage() {
             <span className="section-label">Visi &amp; Misi</span>
             <h2 className="section-title">Komitmen Kami untuk Anda</h2>
             <p className="section-subtitle">
-              {config.about_description || "Kami berkomitmen memberikan layanan rental mobil terbaik di Indonesia dengan standar keamanan dan kenyamanan tertinggi."}
+              {config.about_description || "Sejak 2025 berkomitmen untuk melayani pemenuhan kebutuhan transportasi yang nyaman serta kesiapan armada prima"}
             </p>
           </div>
 
@@ -77,20 +72,21 @@ export default async function AboutPage() {
             {/* Visi Card */}
             <div style={{
               padding: "2rem",
-              background: "var(--primary-light)",
+              background: "var(--surface)",
               borderRadius: "var(--radius-xl)",
-              borderTop: "4px solid var(--primary)",
-              borderRight: "1px solid rgba(99,102,241,0.2)",
-              borderBottom: "1px solid rgba(99,102,241,0.2)",
-              borderLeft: "1px solid rgba(99,102,241,0.2)",
+              borderTop: "4px solid var(--text-primary)",
+              borderRight: "1px solid var(--border)",
+              borderBottom: "1px solid var(--border)",
+              borderLeft: "1px solid var(--border)",
+              boxShadow: "var(--shadow-sm)"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: "var(--radius-lg)",
-                  background: "var(--primary)", display: "flex", alignItems: "center",
+                  background: "var(--text-primary)", color: "white", display: "flex", alignItems: "center",
                   justifyContent: "center", fontSize: "1.25rem", flexShrink: 0,
                 }}>🎯</div>
-                <h3 style={{ color: "var(--primary)", fontSize: "1.25rem", margin: 0 }}>Visi Kami</h3>
+                <h3 style={{ color: "var(--text-primary)", fontSize: "1.25rem", margin: 0 }}>Visi Kami</h3>
               </div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.8, margin: 0 }}>
                 {config.about_vision || "Menjadi perusahaan rental mobil terdepan yang mengutamakan kepuasan dan keselamatan pelanggan."}
@@ -100,27 +96,28 @@ export default async function AboutPage() {
             {/* Misi Card */}
             <div style={{
               padding: "2rem",
-              background: "rgba(16,185,129,0.06)",
+              background: "var(--surface)",
               borderRadius: "var(--radius-xl)",
-              borderTop: "4px solid #10b981",
-              borderRight: "1px solid rgba(16,185,129,0.2)",
-              borderBottom: "1px solid rgba(16,185,129,0.2)",
-              borderLeft: "1px solid rgba(16,185,129,0.2)",
+              borderTop: "4px solid var(--text-primary)",
+              borderRight: "1px solid var(--border)",
+              borderBottom: "1px solid var(--border)",
+              borderLeft: "1px solid var(--border)",
+              boxShadow: "var(--shadow-sm)"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: "var(--radius-lg)",
-                  background: "#10b981", display: "flex", alignItems: "center",
+                  background: "var(--text-primary)", color: "white", display: "flex", alignItems: "center",
                   justifyContent: "center", fontSize: "1.25rem", flexShrink: 0,
                 }}>🚀</div>
-                <h3 style={{ color: "#10b981", fontSize: "1.25rem", margin: 0 }}>Misi Kami</h3>
+                <h3 style={{ color: "var(--text-primary)", fontSize: "1.25rem", margin: 0 }}>Misi Kami</h3>
               </div>
               <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.875rem" }}>
                 {missionPoints.map((point, i) => (
                   <li key={i} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
                     <span style={{
                       width: 22, height: 22, borderRadius: "50%",
-                      background: "#10b981", display: "flex", alignItems: "center",
+                      background: "var(--text-primary)", display: "flex", alignItems: "center",
                       justifyContent: "center", flexShrink: 0,
                       fontSize: "0.7rem", color: "white", fontWeight: 700,
                       marginTop: "0.2rem",
@@ -154,29 +151,112 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Team */}
+      {/* Ragam Pelayanan */}
+      <section className="section" style={{ background: "var(--bg)" }}>
+        <div className="container">
+          <div className="section-header">
+            <span className="section-label">Ragam Pelayanan</span>
+            <h2 className="section-title">Layanan Transportasi Terlengkap</h2>
+            <p className="section-subtitle">Kami menyediakan berbagai pilihan sewa mobil fleksibel untuk memenuhi segala kebutuhan perjalanan Anda.</p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem" }}>
+            {[
+              {
+                title: "Pilihan Waktu Sewa",
+                icon: "📅",
+                desc: "Harian / Mingguan / Bulanan / Tahunan"
+              },
+              {
+                title: "Opsi Pengemudi",
+                icon: "🔑",
+                desc: "Dengan Driver / Non-Driver (Lepas Kunci)"
+              },
+              {
+                title: "Paket Lengkap All In",
+                icon: "⛽",
+                desc: "Sudah Termasuk Unit Mobil, Driver & Bahan Bakar (BBM)"
+              },
+              {
+                title: "Kategori Perjalanan",
+                icon: "🏢",
+                desc: "Perseorangan / Perusahaan / Instansi / Dinas / Perjalanan Bisnis"
+              },
+              {
+                title: "Kesiapan Layanan",
+                icon: "🕐",
+                desc: "Layanan Operasional Siap 24 Jam per 7 Hari Seminggu"
+              },
+              {
+                title: "Layanan Transportasi Hub",
+                icon: "✈️",
+                desc: "Antar-Jemput Bandara, Stasiun Kereta Api, dan Pelabuhan"
+              }
+            ].map((s) => (
+              <div key={s.title} style={{
+                padding: "2rem",
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius-xl)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: "var(--radius-md)", fontSize: "1.25rem",
+                    background: "var(--primary-light)", display: "flex",
+                    alignItems: "center", justifyContent: "center",
+                    color: "var(--primary)"
+                  }}>{s.icon}</div>
+                  <h3 style={{ fontSize: "1.125rem", margin: 0, fontWeight: 700 }}>{s.title}</h3>
+                </div>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Service Guarantees */}
       <section className="section" style={{ background: "var(--surface)" }}>
         <div className="container">
           <div className="section-header">
-            <span className="section-label">Tim Kami</span>
-            <h2 className="section-title">Orang-orang di Balik RentalKu</h2>
-            <p className="section-subtitle">Tim profesional yang berdedikasi untuk memberikan pengalaman terbaik bagi Anda.</p>
+            <span className="section-label">Komitmen Layanan</span>
+            <h2 className="section-title">Jaminan Kenyamanan &amp; Keamanan Anda</h2>
+            <p className="section-subtitle">Kami memberikan garansi layanan terbaik di setiap perjalanan untuk kenyamanan ekstra Anda.</p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem" }}>
-            {team.map((m) => (
-              <div key={m.name} className="card" style={{ textAlign: "center", padding: "2.5rem 1.5rem" }}>
+            {[
+              {
+                title: "Perawatan Bengkel Resmi",
+                icon: "🔧",
+                desc: "Setiap unit armada diservis secara berkala hanya di bengkel dealer resmi untuk memastikan performa mesin dan fitur keselamatan berkendara selalu dalam kondisi 100% prima."
+              },
+              {
+                title: "Kabin Steril & Harum",
+                icon: "✨",
+                desc: "Jaminan kebersihan maksimal. Kabin mobil disemprot disinfektan sebelum diserahkan, bebas dari bekas asap rokok, harum segar mewah, dan bersih layaknya mobil baru."
+              },
+              {
+                title: "Layanan Darurat 24 Jam",
+                icon: "🛡️",
+                desc: "Bantuan darurat di jalan raya (roadside assistance) siaga 24/7 beserta jaminan penggantian unit cadangan instan jika terjadi kendala teknis tak terduga selama masa sewa."
+              }
+            ].map((g) => (
+              <div key={g.title} className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                 <div style={{
-                  width: 80, height: 80, borderRadius: "50%", fontSize: "2.5rem",
+                  width: 56, height: 56, borderRadius: "var(--radius-lg)", fontSize: "1.75rem",
                   background: "var(--primary-light)", display: "flex",
                   alignItems: "center", justifyContent: "center",
-                  margin: "0 auto 1.25rem"
+                  color: "var(--primary)", alignSelf: "center"
                 }}>
-                  {m.emoji}
+                  {g.icon}
                 </div>
-                <h3 style={{ fontSize: "1.125rem", marginBottom: "0.25rem" }}>{m.name}</h3>
-                <p style={{ color: "var(--primary)", fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.75rem" }}>{m.role}</p>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>{m.desc}</p>
+                <h3 style={{ fontSize: "1.25rem", margin: 0, fontWeight: 700, textAlign: "center" }}>{g.title}</h3>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", lineHeight: 1.75, margin: 0, textAlign: "center" }}>{g.desc}</p>
               </div>
             ))}
           </div>

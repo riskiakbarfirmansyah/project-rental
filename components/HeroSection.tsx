@@ -68,9 +68,9 @@ export default function HeroSection({ heroTitle, heroSubtitle }: { heroTitle?: s
                   {"★★★★★".split("").map((s, i) => (
                     <span key={i} style={{ color: "#f59e0b" }}>{s}</span>
                   ))}
-                  <span className="hero-rating-num">4.9</span>
+                  <span className="hero-rating-num">4.7</span>
                 </div>
-                <div className="hero-rating-label">dari 1.200+ ulasan pelanggan</div>
+                <div className="hero-rating-label">dari ulasan pelanggan</div>
               </div>
             </div>
 
@@ -162,23 +162,23 @@ export default function HeroSection({ heroTitle, heroSubtitle }: { heroTitle?: s
             {/* Quick stats */}
             <div className="hero-quick-stats">
               <div className="hero-quick-stat">
-                <div className="hero-quick-stat-num">50+</div>
-                <div className="hero-quick-stat-label">Unit Armada</div>
+                <div className="hero-quick-stat-num">Tahun Muda</div>
+                <div className="hero-quick-stat-label">Armada Terbaru</div>
               </div>
               <div className="hero-quick-stat-sep" />
               <div className="hero-quick-stat">
-                <div className="hero-quick-stat-num">5.000+</div>
-                <div className="hero-quick-stat-label">Pelanggan</div>
+                <div className="hero-quick-stat-num">Instan</div>
+                <div className="hero-quick-stat-label">Konfirmasi WA</div>
               </div>
               <div className="hero-quick-stat-sep" />
               <div className="hero-quick-stat">
-                <div className="hero-quick-stat-num">20+</div>
-                <div className="hero-quick-stat-label">Kota Layanan</div>
+                <div className="hero-quick-stat-num">99%</div>
+                <div className="hero-quick-stat-label">Kepuasan Pelanggan</div>
               </div>
               <div className="hero-quick-stat-sep" />
               <div className="hero-quick-stat">
-                <div className="hero-quick-stat-num">6 Thn</div>
-                <div className="hero-quick-stat-label">Pengalaman</div>
+                <div className="hero-quick-stat-num">Gratis</div>
+                <div className="hero-quick-stat-label">Antar-Jemput</div>
               </div>
             </div>
           </div>
@@ -189,19 +189,34 @@ export default function HeroSection({ heroTitle, heroSubtitle }: { heroTitle?: s
             {/* Main car display */}
             <div className="hero-car-showcase">
               <div className="hero-car-glow" />
-              <div className="hero-car-emoji">🚙</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/hero-car.png"
+                alt="Honda Brio RS"
+                style={{
+                  position: "relative",
+                  zIndex: 1,
+                  width: "115%",
+                  height: "auto",
+                  maxWidth: "540px",
+                  objectFit: "contain",
+                  animation: "carFloat 5s ease-in-out infinite",
+                  filter: "drop-shadow(0 20px 35px rgba(0,0,0,0.35))",
+                  userSelect: "none"
+                }}
+              />
 
               {/* Floating card - price */}
               <div className="hero-float-card hero-float-price">
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <div style={{
-                    width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #1a56db, #1e3a8a)",
+                    width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, var(--primary), var(--primary-dark))",
                     display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem"
                   }}>🚗</div>
                   <div>
                     <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.6)", fontWeight: 600, letterSpacing: "0.04em" }}>MULAI DARI</div>
                     <div style={{ fontFamily: "Sora, sans-serif", fontWeight: 800, color: "white", fontSize: "1.125rem", lineHeight: 1 }}>
-                      Rp 250rb<span style={{ fontSize: "0.75rem", fontWeight: 400, color: "rgba(255,255,255,0.6)" }}>/hari</span>
+                      Rp 250an<span style={{ fontSize: "0.75rem", fontWeight: 400, color: "rgba(255,255,255,0.6)" }}>/hari</span>
                     </div>
                   </div>
                 </div>
@@ -215,8 +230,8 @@ export default function HeroSection({ heroTitle, heroSubtitle }: { heroTitle?: s
                     boxShadow: "0 0 0 3px rgba(16,185,129,0.2)", flexShrink: 0
                   }} />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: "0.875rem", color: "white" }}>32 unit tersedia</div>
-                    <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.55)" }}>Siap dijemput hari ini</div>
+                    <div style={{ fontWeight: 700, fontSize: "0.875rem", color: "white" }}>Armada siap digunakan</div>
+                    <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.55)" }}>Booking mudah via Whatsapp</div>
                   </div>
                 </div>
               </div>
@@ -224,8 +239,8 @@ export default function HeroSection({ heroTitle, heroSubtitle }: { heroTitle?: s
               {/* Floating card - review */}
               <div className="hero-float-card hero-float-review">
                 <div style={{ fontSize: "0.8125rem", color: "#f59e0b", marginBottom: "0.25rem" }}>★★★★★</div>
-                <div style={{ fontSize: "0.8125rem", fontWeight: 600, color: "white", marginBottom: "0.1rem" }}>Pelayanan Luar Biasa!</div>
-                <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.5)" }}>— Andi S., Jakarta</div>
+                <div style={{ fontSize: "0.8125rem", fontWeight: 600, color: "white", marginBottom: "0.1rem" }}>Trusted! Unit is okay, clean & fragrant</div>
+                <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.5)" }}>— Andres Dwi Saputro</div>
               </div>
             </div>
           </div>

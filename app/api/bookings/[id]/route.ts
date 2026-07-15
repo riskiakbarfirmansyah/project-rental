@@ -1,29 +1,23 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import { successResponse, errorResponse } from "@/lib/utils";
 
+// GET /api/bookings/[id] - Get detail booking (admin only)
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getAuthUser();
-    if (!user) return errorResponse("Unauthorized", 401);
+    const auth = await requireAdmin();
+    if ("error" in auth) return errorResponse(auth.error || "Akses ditolak", auth.status);
 
     const { id } = await params;
     const booking = await prisma.booking.findUnique({
-      where: { id },
-      include: {
-        user: { select: { id: true, name: true, email: true, phone: true } },
-        car: true,
-      },
+      where: { id }
     });
 
     if (!booking) return errorResponse("Booking tidak ditemukan", 404);
-    if (user.role !== "ADMIN" && booking.userId !== user.id) {
-      return errorResponse("Forbidden", 403);
-    }
 
     return successResponse({ booking });
   } catch (error) {
@@ -32,58 +26,97 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+// PUT /api/bookings/[id] - Edit booking (admin only)
+export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await requireAdmin();
-    if ("error" in auth) return errorResponse(auth.error, auth.status);
+    if ("error" in auth) return errorResponse(auth.error || "Akses ditolak", auth.status);
 
     const { id } = await params;
-    const { status } = await request.json();
+    const body = await request.json();
 
-    const validStatuses = ["PENDING", "CONFIRMED", "ONGOING", "COMPLETED", "CANCELLED"];
-    if (!validStatuses.includes(status)) {
-      return errorResponse("Status tidak valid");
+    const booking = await prisma.booking.findUnique({ where: { id } });
+    if (!booking) return errorResponse("Booking tidak ditemukan", 404);
+
+    let pricePerDay = booking.pricePerDay;
+    let carName = booking.carName;
+    let carBrand = booking.carBrand;
+    let carYear = booking.carYear;
+    let carType = booking.carType;
+
+    if (body.carId && body.carId !== booking.carId) {
+      const car = await prisma.car.findUnique({ where: { id: body.carId } });
+      if (!car) return errorResponse("Mobil tidak ditemukan", 404);
+      pricePerDay = car.pricePerDay;
+      carName = car.name;
+      carBrand = car.brand;
+      carYear = car.year;
+      carType = car.type;
     }
 
-    const booking = await prisma.booking.update({
+    const duration = body.duration !== undefined ? parseInt(body.duration) : booking.duration;
+    const totalPrice = pricePerDay * duration;
+
+    let pickupDate = booking.pickupDate;
+    if (body.pickupDate) {
+      pickupDate = new Date(body.pickupDate);
+    }
+
+    const endDate = new Date(pickupDate);
+    endDate.setDate(endDate.getDate() + duration);
+
+    const updated = await prisma.booking.update({
       where: { id },
-      data: { status },
+      data: {
+        customerName: body.customerName !== undefined ? body.customerName : booking.customerName,
+        customerWa: body.customerWa !== undefined ? body.customerWa : booking.customerWa,
+        carId: body.carId !== undefined ? body.carId : booking.carId,
+        carName,
+        carBrand,
+        carYear,
+        carType,
+        pickupDate,
+        duration,
+        endDate,
+        pickupLocation: body.pickupLocation !== undefined ? body.pickupLocation : booking.pickupLocation,
+        driverOption: body.driverOption !== undefined ? body.driverOption : booking.driverOption,
+        selectedAdminName: body.selectedAdminName !== undefined ? body.selectedAdminName : booking.selectedAdminName,
+        selectedAdminWa: body.selectedAdminWa !== undefined ? body.selectedAdminWa : booking.selectedAdminWa,
+        pricePerDay,
+        totalPrice,
+        status: body.status !== undefined ? body.status : booking.status,
+        customerNote: body.customerNote !== undefined ? body.customerNote : booking.customerNote,
+        adminNote: body.adminNote !== undefined ? body.adminNote : booking.adminNote,
+      }
     });
 
-    return successResponse({ booking });
+    return successResponse({ booking: updated });
   } catch (error) {
     console.error("Update booking error:", error);
     return errorResponse("Terjadi kesalahan server", 500);
   }
 }
 
+// DELETE /api/bookings/[id] - Delete booking (admin only)
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getAuthUser();
-    if (!user) return errorResponse("Unauthorized", 401);
+    const auth = await requireAdmin();
+    if ("error" in auth) return errorResponse(auth.error || "Akses ditolak", auth.status);
 
     const { id } = await params;
     const booking = await prisma.booking.findUnique({ where: { id } });
     if (!booking) return errorResponse("Booking tidak ditemukan", 404);
 
-    if (user.role !== "ADMIN" && booking.userId !== user.id) {
-      return errorResponse("Forbidden", 403);
-    }
-
-    if (booking.status === "ONGOING" || booking.status === "COMPLETED") {
-      return errorResponse("Booking yang sedang berjalan tidak bisa dibatalkan");
-    }
-
-    await prisma.booking.update({ where: { id }, data: { status: "CANCELLED" } });
-    return successResponse({ message: "Booking berhasil dibatalkan" });
+    await prisma.booking.delete({ where: { id } });
+    return successResponse({ message: "Booking berhasil dihapus" });
   } catch (error) {
-    console.error("Cancel booking error:", error);
+    console.error("Delete booking error:", error);
     return errorResponse("Terjadi kesalahan server", 500);
   }
 }

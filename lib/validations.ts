@@ -21,7 +21,7 @@ export const carSchema = z.object({
   seats: z.number().int().min(1).max(20),
   transmission: z.enum(["MANUAL", "AUTOMATIC"]),
   fuel: z.enum(["BENSIN", "DIESEL", "ELECTRIC", "HYBRID"]),
-  description: z.string().min(10, "Deskripsi minimal 10 karakter"),
+  description: z.string().optional().default(""),
   features: z.array(z.string()).default([]),
   imageUrl: z.string().optional(),
   images: z.array(z.string()).default([]),
@@ -30,10 +30,15 @@ export const carSchema = z.object({
 
 export const bookingSchema = z.object({
   carId: z.string().min(1, "Pilih mobil terlebih dahulu"),
-  startDate: z.string().min(1, "Tanggal mulai wajib diisi"),
-  endDate: z.string().min(1, "Tanggal selesai wajib diisi"),
+  customerName: z.string().min(2, "Nama minimal 2 karakter"),
+  customerWa: z.string().min(5, "Nomor WhatsApp tidak valid"),
+  pickupDate: z.string().min(1, "Tanggal ambil wajib diisi"),
+  duration: z.number().int().min(1, "Durasi sewa minimal 1 hari"),
   pickupLocation: z.string().min(3, "Lokasi penjemputan wajib diisi"),
-  notes: z.string().optional(),
+  driverOption: z.string().min(1, "Pilihan sewa wajib diisi"),
+  selectedAdminName: z.string().min(1, "Pilih admin terlebih dahulu"),
+  selectedAdminWa: z.string().min(5, "Nomor WhatsApp admin tidak valid"),
+  customerNote: z.string().optional(),
 });
 
 export const blogSchema = z.object({

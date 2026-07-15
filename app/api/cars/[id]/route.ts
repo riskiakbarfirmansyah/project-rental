@@ -30,7 +30,7 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const parsed = carSchema.partial().safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const { features, images, ...rest } = parsed.data;
     const updateData: Record<string, unknown> = { ...rest };

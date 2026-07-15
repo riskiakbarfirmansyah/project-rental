@@ -10,6 +10,7 @@ const navItems = [
   { href: "/admin/bookings", label: "Booking", icon: "📅" },
   { href: "/admin/blog", label: "Blog", icon: "📝" },
   { href: "/admin/gallery", label: "Galeri", icon: "🖼️" },
+  { href: "/admin/reviews", label: "Review", icon: "⭐" },
   { href: "/admin/faq", label: "FAQ", icon: "❓" },
   { href: "/admin/config", label: "Konfigurasi", icon: "⚙️" },
 ];

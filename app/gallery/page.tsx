@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import GalleryLightbox from "@/app/gallery/Gallerylightbox";
 
 export const metadata: Metadata = { title: "Galeri" };
 
@@ -29,44 +29,7 @@ export default async function GalleryPage() {
       <section className="section">
         <div className="container">
           {items.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem" }}>
-              {items.map((item) => (
-                <div key={item.id} id={`gallery-item-${item.id}`} style={{
-                  borderRadius: "var(--radius-lg)", overflow: "hidden",
-                  border: "1px solid var(--border)", transition: "var(--transition)",
-                  background: "var(--surface)", display: "flex", flexDirection: "column",
-                }}>
-                  {/* Uniform image height */}
-                  <div style={{
-                    position: "relative",
-                    width: "100%",
-                    height: 240,
-                    flexShrink: 0,
-                    background: "var(--primary-light)",
-                  }}>
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
-
-                  <div style={{ padding: "1.25rem", flex: 1 }}>
-                    <h3 style={{ fontSize: "1rem", marginBottom: "0.375rem" }}>{item.title}</h3>
-                    {item.description && (
-                      <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>{item.description}</p>
-                    )}
-                    {item.car && (
-                      <div style={{ marginTop: "0.75rem" }}>
-                        <span className="badge badge-primary">{item.car.brand} {item.car.name}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <GalleryLightbox items={items} />
           ) : (
             <div style={{ textAlign: "center", padding: "4rem" }}>
               <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>📸</div>

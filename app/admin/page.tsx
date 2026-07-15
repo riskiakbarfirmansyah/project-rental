@@ -26,6 +26,7 @@ interface RecentBooking {
 
 const STATUS_CONFIG: Record<string, { bg: string; color: string; label: string }> = {
   PENDING: { bg: "#fef3c7", color: "#d97706", label: "Menunggu" },
+  PENDING_CONFIRMATION: { bg: "#fef3c7", color: "#d97706", label: "Menunggu" },
   CONFIRMED: { bg: "#e0f2fe", color: "#0284c7", label: "Dikonfirmasi" },
   ONGOING: { bg: "#e0e7ff", color: "#4f46e5", label: "Berlangsung" },
   COMPLETED: { bg: "#d1fae5", color: "#059669", label: "Selesai" },

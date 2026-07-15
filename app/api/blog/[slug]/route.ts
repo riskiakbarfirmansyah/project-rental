@@ -33,7 +33,7 @@ export async function PUT(
     const { slug } = await params;
     const body = await request.json();
     const parsed = blogSchema.partial().safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const post = await prisma.blogPost.update({ where: { slug }, data: parsed.data });
     return successResponse({ post });

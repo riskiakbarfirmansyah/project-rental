@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const parsed = gallerySchema.safeParse(body);
-    if (!parsed.success) return errorResponse(parsed.error.errors[0].message);
+    if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const item = await prisma.galleryItem.create({ data: parsed.data });
     return successResponse({ item }, 201);

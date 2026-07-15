@@ -57,7 +57,7 @@ export default function Navbar() {
             href="/"
             className="navbar-brand"
             id="navbar-brand"
-            style={{ display: "flex", alignItems: "center" }}
+            style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}
           >
             <Image
               src="/images/logo-no-bg.png"
@@ -70,6 +70,7 @@ export default function Navbar() {
                 height: "auto",
                 objectFit: "contain",
                 filter: "grayscale(100%) brightness(0)",
+                flexShrink: 0,
               }}
             />
           </Link>
