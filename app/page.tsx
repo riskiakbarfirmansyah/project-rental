@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import WhyUsFeatures from "@/components/WhyUsFeatures";
 import HeroSection from "@/components/HeroSection";
 import ReviewsSection from "@/components/ReviewsSection";
+import ScrollReveal from "@/components/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "Bella Belly Trans Co",
@@ -46,52 +47,65 @@ export default async function HomePage() {
       <HeroSection
         heroTitle={config.hero_title}
         heroSubtitle={config.hero_subtitle}
+        featuredReview={reviews[0] || null}
       />
 
       {/* FEATURED CARS */}
       <section className="section" style={{ background: "var(--bg)" }}>
         <div className="container">
-          <div className="section-header">
-            <span className="section-label">Armada Pilihan</span>
-            <h2 className="section-title">Mobil Tersedia untuk Anda</h2>
-            <p className="section-subtitle">
-              Pilihan kendaraan berkualitas tinggi dengan perawatan rutin. Tersedia untuk berbagai kebutuhan perjalanan Anda.
-            </p>
-          </div>
+          <ScrollReveal direction="up">
+            <div className="section-header">
+              <span className="section-label">Armada Pilihan</span>
+              <h2 className="section-title">Mobil Tersedia untuk Anda</h2>
+              <p className="section-subtitle">
+                Pilihan kendaraan berkualitas tinggi dengan perawatan rutin. Tersedia untuk berbagai kebutuhan perjalanan Anda.
+              </p>
+            </div>
+          </ScrollReveal>
 
           {cars.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.75rem" }}>
-              {cars.map((car) => (
-                <CarCard key={car.id} car={car} />
-              ))}
-            </div>
+            <ScrollReveal direction="up" delay={150}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.75rem" }}>
+                {cars.map((car) => (
+                  <CarCard key={car.id} car={car} />
+                ))}
+              </div>
+            </ScrollReveal>
           ) : (
-            <div style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>
-              <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🚗</div>
-              <p>Belum ada mobil tersedia saat ini.</p>
-            </div>
+            <ScrollReveal direction="up" delay={150}>
+              <div style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>
+                <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🚗</div>
+                <p>Belum ada mobil tersedia saat ini.</p>
+              </div>
+            </ScrollReveal>
           )}
 
-          <div style={{ textAlign: "center", marginTop: "3rem" }}>
-            <a href="/services" className="btn btn-primary btn-lg" id="home-see-all-cars">
-              Lihat Semua Armada →
-            </a>
-          </div>
+          <ScrollReveal direction="up" delay={250}>
+            <div style={{ textAlign: "center", marginTop: "3rem" }}>
+              <a href="/services" className="btn btn-primary btn-lg" id="home-see-all-cars">
+                Lihat Semua Armada →
+              </a>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* WHY US */}
       <section className="section" style={{ background: "var(--surface)" }}>
         <div className="container">
-          <div className="section-header">
-            <span className="section-label">Mengapa Kami</span>
-            <h2 className="section-title">Keunggulan Bella Belly Trans Co</h2>
-            <p className="section-subtitle">
-              Kami hadir dengan layanan terbaik untuk memastikan perjalanan Anda nyaman dan aman.
-            </p>
-          </div>
+          <ScrollReveal direction="up">
+            <div className="section-header">
+              <span className="section-label">Mengapa Kami</span>
+              <h2 className="section-title">Keunggulan Bella Belly Trans Co</h2>
+              <p className="section-subtitle">
+                Kami hadir dengan layanan terbaik untuk memastikan perjalanan Anda nyaman dan aman.
+              </p>
+            </div>
+          </ScrollReveal>
 
-          <WhyUsFeatures />
+          <ScrollReveal direction="up" delay={150}>
+            <WhyUsFeatures />
+          </ScrollReveal>
         </div>
       </section>
 
@@ -108,29 +122,33 @@ export default async function HomePage() {
           pointerEvents: "none"
         }} />
         <div className="container" style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
-          <h2 style={{ color: "white", marginBottom: "1.25rem" }}>
-            Siap Memulai Perjalanan Anda?
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "1.125rem", maxWidth: 500, margin: "0 auto 2.5rem" }}>
-            Pesan sekarang dan dapatkan pengalaman berkendara yang nyaman dan aman bersama Bella Belly Trans Co.
-          </p>
-          <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="/services" className="btn btn-secondary btn-lg" id="cta-book-now">
-              Pesan Sekarang
-            </a>
-            <a href="https://wa.me/6281325485262" target="_blank" rel="noopener noreferrer"
-              className="btn btn-ghost btn-lg" id="cta-whatsapp">
-              💬 Chat WhatsApp
-            </a>
-          </div>
+          <ScrollReveal direction="up">
+            <h2 style={{ color: "white", marginBottom: "1.25rem" }}>
+              Siap Memulai Perjalanan Anda?
+            </h2>
+            <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "1.125rem", maxWidth: 500, margin: "0 auto 2.5rem" }}>
+              Pesan sekarang dan dapatkan pengalaman berkendara yang nyaman dan aman bersama Bella Belly Trans Co.
+            </p>
+            <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
+              <a href="/services" className="btn btn-secondary btn-lg" id="cta-book-now">
+                Pesan Sekarang
+              </a>
+              <a href="https://wa.me/6281325485262" target="_blank" rel="noopener noreferrer"
+                className="btn btn-ghost btn-lg" id="cta-whatsapp">
+                💬 Chat WhatsApp
+              </a>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* Reviews & Google Maps */}
-      <ReviewsSection
-        reviews={reviews}
-        mapsEmbedUrl={config.google_maps_embed || undefined}
-      />
+      <ScrollReveal direction="up">
+        <ReviewsSection
+          reviews={reviews}
+          mapsEmbedUrl={config.google_maps_embed || undefined}
+        />
+      </ScrollReveal>
 
       <Footer />
     </>

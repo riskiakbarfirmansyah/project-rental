@@ -36,14 +36,7 @@ export default async function AboutPage() {
         }} />
         <div className="container" style={{ position: "relative", zIndex: 1 }}>
           <div style={{ maxWidth: 680 }}>
-            <div style={{
-              display: "inline-block", padding: "0.375rem 1rem", marginBottom: "1.25rem",
-              background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)",
-              borderRadius: "var(--radius-full)", color: "rgba(255,255,255,0.9)",
-              fontSize: "0.875rem", fontWeight: 600
-            }}>
-              🏆 Tentang Kami
-            </div>
+
             <h1 style={{ color: "white", marginBottom: "1.25rem" }}>
               {config.about_title || "Tentang Bella Belly Trans Co"}
             </h1>

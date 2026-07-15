@@ -63,7 +63,7 @@ export default function ReviewsSection({ reviews, mapsEmbedUrl }: ReviewsSection
                   <Stars rating={5} />
                 </div>
                 <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                  {reviews.length} ulasan pelanggan
+                  {reviews.length} Google Reviews
                 </div>
               </div>
 
@@ -131,6 +131,7 @@ export default function ReviewsSection({ reviews, mapsEmbedUrl }: ReviewsSection
             borderRadius: "var(--radius-xl)", overflow: "hidden",
             border: "1px solid var(--border)", height: 400,
             boxShadow: "var(--shadow-md)",
+            marginTop: "3rem"
           }}>
             <iframe
               src={mapsEmbedUrl}

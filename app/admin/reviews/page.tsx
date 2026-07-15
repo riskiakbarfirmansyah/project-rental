@@ -58,7 +58,7 @@ export default function AdminReviewsPage() {
       reviewerAvatar: r.reviewerAvatar || "",
       rating: r.rating,
       content: r.content,
-      source: r.source,
+      source: "Google",
       reviewDate: r.reviewDate || "",
       isVisible: r.isVisible,
       order: r.order,
@@ -75,7 +75,7 @@ export default function AdminReviewsPage() {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, rating: Number(form.rating), order: Number(form.order) }),
+      body: JSON.stringify({ ...form, source: "Google", rating: Number(form.rating), order: Number(form.order) }),
     });
     const data = await res.json();
     if (data.success) { setShowForm(false); load(); }
@@ -152,7 +152,7 @@ export default function AdminReviewsPage() {
                   <span style={{ fontWeight: 700 }}>{r.reviewerName}</span>
                   <Stars rating={r.rating} />
                   <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", background: "var(--bg)", padding: "0.125rem 0.5rem", borderRadius: "var(--radius-full)" }}>
-                    {r.source}
+                    Google Review
                   </span>
                   {r.reviewDate && <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{r.reviewDate}</span>}
                 </div>
@@ -234,15 +234,7 @@ export default function AdminReviewsPage() {
                     value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required />
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="rv-source">Sumber</label>
-                    <select id="rv-source" className="form-control" value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })}>
-                      <option value="Google">Google</option>
-                      <option value="WhatsApp">WhatsApp</option>
-                      <option value="Langsung">Langsung</option>
-                    </select>
-                  </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                   <div className="form-group">
                     <label className="form-label" htmlFor="rv-order">Urutan Tampil</label>
                     <input id="rv-order" type="number" className="form-control" min={0}

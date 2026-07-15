@@ -36,11 +36,14 @@ const CONFIG_FIELDS = [
   ]},
 ];
 
+const SECTION_ICONS = ["🌐", "🚀", "🏢", "📞", "📊"];
+
 export default function AdminConfigPage() {
   const [config, setConfig] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
     fetch("/api/config").then((r) => r.json()).then((d) => {
@@ -69,53 +72,223 @@ export default function AdminConfigPage() {
     </div>
   );
 
+  const currentSection = CONFIG_FIELDS[activeTab];
+
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+      
+      {/* Local scoped styling */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .modern-title {
+          font-family: 'Sora', sans-serif;
+          font-weight: 800;
+          color: var(--text-primary);
+          font-size: 2rem;
+          letter-spacing: -0.02em;
+        }
+        .settings-layout {
+          display: grid;
+          grid-template-columns: 260px 1fr;
+          gap: 2rem;
+          align-items: start;
+        }
+        @media (max-width: 868px) {
+          .settings-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+        }
+        .settings-sidebar {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          padding: 0.75rem;
+          box-shadow: var(--shadow-sm);
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+        .settings-tab-btn {
+          border: none;
+          background: transparent;
+          text-align: left;
+          padding: 0.875rem 1.25rem;
+          border-radius: 12px;
+          font-family: inherit;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--text-secondary);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          transition: var(--transition);
+        }
+        .settings-tab-btn:hover {
+          background: var(--surface-2);
+          color: var(--text-primary);
+        }
+        .settings-tab-btn.active {
+          background: var(--primary);
+          color: white;
+        }
+        .settings-content-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 24px;
+          padding: 2rem;
+          box-shadow: var(--shadow-sm);
+          animation: slideUp 0.25s ease-out;
+        }
+        @keyframes slideUp {
+          from { transform: translateY(8px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .settings-section-title {
+          font-family: 'Sora', sans-serif;
+          font-size: 1.25rem;
+          font-weight: 800;
+          margin-bottom: 1.5rem;
+          padding-bottom: 0.875rem;
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        .form-control-modern {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          font-family: inherit;
+          font-size: 0.875rem;
+          outline: none;
+          color: var(--text-primary);
+          transition: var(--transition);
+        }
+        .form-control-modern:focus {
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05);
+        }
+        .form-label-modern {
+          font-size: 0.75rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--text-primary);
+          margin-bottom: 0.375rem;
+          display: block;
+        }
+        .toast-saved-banner {
+          position: fixed;
+          bottom: 2rem;
+          right: 2rem;
+          background: var(--success);
+          color: white;
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          font-weight: 700;
+          font-size: 0.875rem;
+          box-shadow: var(--shadow-xl);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          animation: slideInRight 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+          z-index: 1000;
+        }
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      ` }} />
+
+      {/* ── TOP HEADER SECTION ── */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
         <div>
-          <h1 style={{ fontSize: "1.75rem", marginBottom: "0.25rem" }}>Konfigurasi Website</h1>
-          <p style={{ color: "var(--text-secondary)" }}>Edit semua konten website dari sini</p>
-        </div>
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          {saved && <span className="badge badge-success">✓ Tersimpan!</span>}
-          <button className="btn btn-primary" onClick={handleSave} disabled={saving} id="save-config-btn">
-            {saving ? "Menyimpan..." : "💾 Simpan Semua"}
-          </button>
+          <h1 className="modern-title">Konfigurasi Website</h1>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem" }}>
+            Sesuaikan konten visual, teks, kontak, dan statistik website utama Anda dari sini.
+          </p>
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-        {CONFIG_FIELDS.map((section) => (
-          <div key={section.section} style={{ background: "var(--surface)", borderRadius: "var(--radius-xl)", padding: "2rem", border: "1px solid var(--border)" }}>
-            <h3 style={{ marginBottom: "1.5rem", paddingBottom: "0.75rem", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--primary)", display: "inline-block" }} />
-              {section.section}
-            </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
-              {section.fields.map((field) => (
-                <div key={field.key} className="form-group" style={{ margin: 0, gridColumn: field.type === "textarea" ? "1 / -1" : "auto" }}>
-                  <label className="form-label" htmlFor={`config-${field.key}`}>{field.label}</label>
+      {/* ── SETTINGS SPLIT LAYOUT ── */}
+      <div className="settings-layout">
+        
+        {/* Left Side: Navigation Sidebar */}
+        <div className="settings-sidebar">
+          {CONFIG_FIELDS.map((section, idx) => (
+            <button
+              key={section.section}
+              className={`settings-tab-btn ${activeTab === idx ? "active" : ""}`}
+              onClick={() => setActiveTab(idx)}
+            >
+              <span style={{ fontSize: "1.1rem" }}>{SECTION_ICONS[idx]}</span>
+              <span>{section.section}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Right Side: Active Settings Form */}
+        <div className="settings-content-card">
+          <h3 className="settings-section-title">
+            <span style={{ fontSize: "1.25rem" }}>{SECTION_ICONS[activeTab]}</span>
+            {currentSection.section}
+          </h3>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1.25rem" }}>
+              {currentSection.fields.map((field) => (
+                <div key={field.key} className="form-group" style={{ margin: 0 }}>
+                  <label className="form-label-modern" htmlFor={`config-${field.key}`}>{field.label}</label>
                   {field.type === "textarea" ? (
-                    <textarea id={`config-${field.key}`} className="form-control" rows={3}
+                    <textarea
+                      id={`config-${field.key}`}
+                      className="form-control-modern"
+                      rows={4}
                       value={config[field.key] || ""}
-                      onChange={(e) => handleChange(field.key, e.target.value)} />
+                      onChange={(e) => handleChange(field.key, e.target.value)}
+                      placeholder={`Masukkan ${field.label.toLowerCase()}...`}
+                      style={{ padding: "0.75rem" }}
+                    />
                   ) : (
-                    <input id={`config-${field.key}`} type="text" className="form-control"
+                    <input
+                      id={`config-${field.key}`}
+                      type="text"
+                      className="form-control-modern"
                       value={config[field.key] || ""}
-                      onChange={(e) => handleChange(field.key, e.target.value)} />
+                      onChange={(e) => handleChange(field.key, e.target.value)}
+                      placeholder={`Masukkan ${field.label.toLowerCase()}...`}
+                    />
                   )}
                 </div>
               ))}
             </div>
+
+            {/* Bottom Actions for current card */}
+            <div style={{ display: "flex", justifyContent: "flex-end", borderTop: "1px solid var(--border)", paddingTop: "1.5rem", marginTop: "0.5rem" }}>
+              <button
+                className="btn btn-primary"
+                onClick={handleSave}
+                disabled={saving}
+                id="save-config-btn"
+                style={{ borderRadius: "10px", padding: "0.65rem 1.5rem" }}
+              >
+                {saving ? "Menyimpan..." : "💾 Simpan Perubahan"}
+              </button>
+            </div>
           </div>
-        ))}
+        </div>
+
       </div>
 
-      <div style={{ marginTop: "2rem", display: "flex", justifyContent: "flex-end" }}>
-        <button className="btn btn-primary btn-lg" onClick={handleSave} disabled={saving} id="save-config-btn-bottom">
-          {saving ? "Menyimpan..." : "💾 Simpan Semua Perubahan"}
-        </button>
-      </div>
+      {/* Floating Save Success Banner */}
+      {saved && (
+        <div className="toast-saved-banner">
+          <span>✓</span> Konfigurasi berhasil disimpan ke database!
+        </div>
+      )}
+      
     </div>
   );
 }
