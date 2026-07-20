@@ -12,11 +12,47 @@ const CONFIG_FIELDS = [
     { key: "hero_title", label: "Judul Hero", type: "text" },
     { key: "hero_subtitle", label: "Subjudul Hero", type: "textarea" },
   ]},
-  { section: "Tentang Kami", fields: [
+  { section: "Tentang Kami (Utama)", fields: [
     { key: "about_title", label: "Judul Halaman About", type: "text" },
     { key: "about_description", label: "Deskripsi Perusahaan", type: "textarea" },
     { key: "about_vision", label: "Visi Perusahaan", type: "textarea" },
-    { key: "about_mission", label: "Misi Perusahaan", type: "textarea" },
+    { key: "about_mission", label: "Misi Perusahaan (Gunakan tanda * untuk memisahkan poin)", type: "textarea" },
+  ]},
+  { section: "Tentang Kami (Nilai)", fields: [
+    { key: "about_val1_title", label: "Nilai 1: Judul", type: "text" },
+    { key: "about_val1_desc", label: "Nilai 1: Deskripsi", type: "textarea" },
+    { key: "about_val2_title", label: "Nilai 2: Judul", type: "text" },
+    { key: "about_val2_desc", label: "Nilai 2: Deskripsi", type: "textarea" },
+    { key: "about_val3_title", label: "Nilai 3: Judul", type: "text" },
+    { key: "about_val3_desc", label: "Nilai 3: Deskripsi", type: "textarea" },
+    { key: "about_val4_title", label: "Nilai 4: Judul", type: "text" },
+    { key: "about_val4_desc", label: "Nilai 4: Deskripsi", type: "textarea" },
+  ]},
+  { section: "Tentang Kami (Layanan)", fields: [
+    { key: "about_srv1_title", label: "Layanan 1: Judul", type: "text" },
+    { key: "about_srv1_desc", label: "Layanan 1: Deskripsi", type: "textarea" },
+    { key: "about_srv2_title", label: "Layanan 2: Judul", type: "text" },
+    { key: "about_srv2_desc", label: "Layanan 2: Deskripsi", type: "textarea" },
+    { key: "about_srv3_title", label: "Layanan 3: Judul", type: "text" },
+    { key: "about_srv3_desc", label: "Layanan 3: Deskripsi", type: "textarea" },
+    { key: "about_srv4_title", label: "Layanan 4: Judul", type: "text" },
+    { key: "about_srv4_desc", label: "Layanan 4: Deskripsi", type: "textarea" },
+    { key: "about_srv5_title", label: "Layanan 5: Judul", type: "text" },
+    { key: "about_srv5_desc", label: "Layanan 5: Deskripsi", type: "textarea" },
+    { key: "about_srv6_title", label: "Layanan 6: Judul", type: "text" },
+    { key: "about_srv6_desc", label: "Layanan 6: Deskripsi", type: "textarea" },
+  ]},
+  { section: "Tentang Kami (Komitmen)", fields: [
+    { key: "about_grt1_title", label: "Komitmen 1: Judul", type: "text" },
+    { key: "about_grt1_desc", label: "Komitmen 1: Deskripsi", type: "textarea" },
+    { key: "about_grt2_title", label: "Komitmen 2: Judul", type: "text" },
+    { key: "about_grt2_desc", label: "Komitmen 2: Deskripsi", type: "textarea" },
+    { key: "about_grt3_title", label: "Komitmen 3: Judul", type: "text" },
+    { key: "about_grt3_desc", label: "Komitmen 3: Deskripsi", type: "textarea" },
+  ]},
+  { section: "Halaman Booking (Pemesanan)", fields: [
+    { key: "booking_promo_title", label: "Judul Promo / Info", type: "text" },
+    { key: "booking_promo_desc", label: "Isi Promo (Gunakan tanda * untuk memisahkan poin)", type: "textarea" },
   ]},
   { section: "Kontak & Sosial Media", fields: [
     { key: "contact_phone", label: "Nomor Telepon", type: "text" },
@@ -36,7 +72,7 @@ const CONFIG_FIELDS = [
   ]},
 ];
 
-const SECTION_ICONS = ["🌐", "🚀", "🏢", "📞", "📊"];
+const SECTION_ICONS = ["🌐", "🚀", "🏢", "💎", "🚗", "🛡️", "📝", "📞", "📊"];
 
 export default function AdminConfigPage() {
   const [config, setConfig] = useState<Record<string, string>>({});

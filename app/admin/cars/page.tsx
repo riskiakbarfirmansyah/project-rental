@@ -5,18 +5,16 @@ import { useState, useEffect, useRef } from "react";
 interface Car {
   id: string; name: string; brand: string; year: number; type: string;
   pricePerDay: number; seats: number; transmission: string; fuel: string;
-  description: string; features: string; isAvailable: boolean; imageUrl?: string;
+  description: string; isAvailable: boolean; withDriverOnly: boolean; imageUrl?: string;
 }
 
-const CAR_TYPES = ["SEDAN", "SUV", "MPV", "PICKUP", "MINIBUS", "SPORT"];
 const TRANSMISSIONS = ["MANUAL", "AUTOMATIC"];
 const FUELS = ["BENSIN", "DIESEL", "ELECTRIC", "HYBRID"];
-const TYPE_LABELS: Record<string, string> = { SEDAN: "Sedan", SUV: "SUV", MPV: "MPV", PICKUP: "Pickup", MINIBUS: "Minibus", SPORT: "Sport" };
 
 const EMPTY_FORM = {
-  name: "", brand: "", year: "2024", type: "SUV", pricePerDay: "0", seats: "5",
-  transmission: "AUTOMATIC", fuel: "BENSIN", description: "", features: "",
-  imageUrl: "", isAvailable: true,
+  name: "", brand: "", year: "2024", pricePerDay: "0", seats: "5",
+  transmission: "AUTOMATIC", fuel: "BENSIN", description: "",
+  imageUrl: "", isAvailable: true, withDriverOnly: false,
 };
 
 export default function AdminCarsPage() {
@@ -32,7 +30,6 @@ export default function AdminCarsPage() {
 
   // Modern UI states
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState("DEFAULT");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -50,12 +47,12 @@ export default function AdminCarsPage() {
   const openAdd = () => { setEditing(null); setForm(EMPTY_FORM); setError(""); setShowForm(true); };
   const openEdit = (car: Car) => {
     setEditing(car);
-    const features: string[] = (() => { try { return JSON.parse(car.features); } catch { return []; } })();
     setForm({
-      name: car.name, brand: car.brand, year: String(car.year), type: car.type,
-      pricePerDay: String(car.pricePerDay), seats: String(car.seats), transmission: car.transmission,
-      fuel: car.fuel, description: car.description, features: features.join(", "),
+      name: car.name, brand: car.brand, year: String(car.year),
+      pricePerDay: Number(car.pricePerDay).toLocaleString("id-ID"), seats: String(car.seats), transmission: car.transmission,
+      fuel: car.fuel, description: car.description,
       imageUrl: car.imageUrl || "", isAvailable: car.isAvailable,
+      withDriverOnly: car.withDriverOnly || false,
     });
     setError("");
     setShowForm(true);
@@ -81,8 +78,6 @@ export default function AdminCarsPage() {
       year: parseInt(String(form.year)) || 2024,
       pricePerDay: parseInt(String(form.pricePerDay).replace(/\D/g, "")) || 0,
       seats: parseInt(String(form.seats)) || 1,
-      features: form.features ? form.features.split(",").map((f) => f.trim()).filter(Boolean) : [],
-      images: [],
     };
     console.log("[Cars] Submitting payload:", JSON.stringify(payload));
     const url = editing ? `/api/cars/${editing.id}` : "/api/cars";
@@ -112,12 +107,11 @@ export default function AdminCarsPage() {
       const matchSearch =
         car.name.toLowerCase().includes(search.toLowerCase()) ||
         car.brand.toLowerCase().includes(search.toLowerCase());
-      const matchType = typeFilter === "ALL" || car.type === typeFilter;
       const matchStatus =
         statusFilter === "ALL" ||
         (statusFilter === "AVAILABLE" && car.isAvailable) ||
         (statusFilter === "UNAVAILABLE" && !car.isAvailable);
-      return matchSearch && matchType && matchStatus;
+      return matchSearch && matchStatus;
     })
     .sort((a, b) => {
       if (sortBy === "PRICE_ASC") return a.pricePerDay - b.pricePerDay;
@@ -657,18 +651,6 @@ export default function AdminCarsPage() {
 
         {/* Filters & Sorting */}
         <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
-          {/* Tipe Filter */}
-          <select
-            className="filter-select-custom"
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-          >
-            <option value="ALL">Semua Tipe</option>
-            {CAR_TYPES.map((t) => (
-              <option key={t} value={t}>{TYPE_LABELS[t] || t}</option>
-            ))}
-          </select>
-
           {/* Status Filter */}
           <select
             className="filter-select-custom"
@@ -735,8 +717,6 @@ export default function AdminCarsPage() {
             <div key={car.id} className="car-card-modern" id={`admin-car-row-${car.id}`}>
               {/* Image Container */}
               <div className="car-card-image-box">
-                <span className="car-card-floating-badge">{TYPE_LABELS[car.type] || car.type}</span>
-                
                 {/* Availability Toggle */}
                 <div className="car-card-avail-badge">
                   <label className="ios-toggle">
@@ -778,6 +758,11 @@ export default function AdminCarsPage() {
                   <span className="car-spec-badge" title="Bahan Bakar" style={{ textTransform: "capitalize" }}>
                     ⛽ {car.fuel.toLowerCase()}
                   </span>
+                  {car.withDriverOnly && (
+                    <span className="car-spec-badge" title="Hanya Dengan Supir" style={{ background: "rgba(37,99,235,0.1)", color: "#2563eb", borderColor: "#bfdbfe" }}>
+                      👨‍✈️ Dengan Supir
+                    </span>
+                  )}
                 </div>
 
                 {/* Price & Actions */}
@@ -820,8 +805,7 @@ export default function AdminCarsPage() {
           <table className="modern-table">
             <thead>
               <tr>
-                <th style={{ width: "35%" }}>Kendaraan</th>
-                <th>Tipe</th>
+                <th style={{ width: "40%" }}>Kendaraan</th>
                 <th>Harga / Hari</th>
                 <th>Kapasitas</th>
                 <th>Status</th>
@@ -854,16 +838,12 @@ export default function AdminCarsPage() {
                       </div>
                     </div>
                   </td>
-                  <td>
-                    <span className="badge badge-primary" style={{ padding: "0.25rem 0.5rem", borderRadius: "6px", fontSize: "0.75rem" }}>
-                      {TYPE_LABELS[car.type] || car.type}
-                    </span>
-                  </td>
                   <td style={{ fontWeight: 700, color: "var(--text-primary)" }}>
                     Rp {car.pricePerDay.toLocaleString("id-ID")}
                   </td>
                   <td style={{ fontWeight: 500 }}>
                     {car.seats} Kursi
+                    {car.withDriverOnly && <div style={{ fontSize: "0.7rem", color: "#2563eb", marginTop: "0.25rem", fontWeight: 700 }}>👨‍✈️ Wajib Supir</div>}
                   </td>
                   <td>
                     <label className="ios-toggle">
@@ -980,33 +960,20 @@ export default function AdminCarsPage() {
                     />
                   </div>
 
-                  {/* Tipe */}
-                  <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-                    <label className="form-label" htmlFor="car-type" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Tipe Bodi *</label>
-                    <select
-                      id="car-type"
-                      className="form-control"
-                      value={form.type}
-                      onChange={(e) => setForm({ ...form, type: e.target.value })}
-                      style={{ borderRadius: "10px" }}
-                    >
-                      {CAR_TYPES.map((t) => (
-                        <option key={t} value={t}>{TYPE_LABELS[t] || t}</option>
-                      ))}
-                    </select>
-                  </div>
-
                   {/* Tarif Sewa */}
                   <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
                     <label className="form-label" htmlFor="car-price" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Tarif per Hari (Rp) *</label>
                     <input
                       id="car-price"
-                      type="number"
+                      type="text"
                       className="form-control"
-                      placeholder="350000"
+                      placeholder="350.000"
                       value={form.pricePerDay}
-                      onChange={(e) => setForm({ ...form, pricePerDay: e.target.value })}
-                      min={0}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\D/g, "");
+                        const formatted = raw ? parseInt(raw, 10).toLocaleString("id-ID") : "";
+                        setForm({ ...form, pricePerDay: formatted });
+                      }}
                       required
                       style={{ borderRadius: "10px" }}
                     />
@@ -1062,6 +1029,23 @@ export default function AdminCarsPage() {
 
                 </div>
 
+                {/* Pengaturan Tambahan */}
+                <div className="form-group" style={{ display: "flex", gap: "0.75rem", alignItems: "center", padding: "1rem", background: "var(--surface-2)", borderRadius: "10px", border: "1px solid var(--border)" }}>
+                  <label className="ios-toggle">
+                    <input
+                      type="checkbox"
+                      checked={form.withDriverOnly || false}
+                      onChange={(e) => setForm({ ...form, withDriverOnly: e.target.checked })}
+                      id="car-with-driver-only"
+                    />
+                    <span className="ios-toggle-slider"></span>
+                  </label>
+                  <div>
+                    <div style={{ fontSize: "0.875rem", fontWeight: 700 }}>Hanya dengan Supir (Tidak Bisa Lepas Kunci)</div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>Aktifkan ini jika mobil hanya diizinkan untuk disewa beserta supir. Pilihan lepas kunci akan disembunyikan.</div>
+                  </div>
+                </div>
+
                 {/* Deskripsi */}
                 <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
                   <label className="form-label" htmlFor="car-description" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Deskripsi Singkat</label>
@@ -1073,19 +1057,6 @@ export default function AdminCarsPage() {
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     style={{ borderRadius: "10px", padding: "0.75rem" }}
-                  />
-                </div>
-
-                {/* Fitur */}
-                <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-                  <label className="form-label" htmlFor="car-features" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Fitur Utama (pisahkan dengan koma)</label>
-                  <input
-                    id="car-features"
-                    className="form-control"
-                    placeholder="Contoh: AC, GPS, Bluetooth, Kamera Mundur, Sunroof"
-                    value={form.features}
-                    onChange={(e) => setForm({ ...form, features: e.target.value })}
-                    style={{ borderRadius: "10px" }}
                   />
                 </div>
 

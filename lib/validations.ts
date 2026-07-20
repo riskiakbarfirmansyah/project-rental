@@ -16,16 +16,14 @@ export const carSchema = z.object({
   name: z.string().min(2, "Nama mobil minimal 2 karakter"),
   brand: z.string().min(1, "Brand wajib diisi"),
   year: z.number().int().min(1990).max(new Date().getFullYear() + 1),
-  type: z.enum(["SEDAN", "SUV", "MPV", "PICKUP", "MINIBUS", "SPORT"]),
   pricePerDay: z.number().int().min(1, "Harga harus lebih dari 0"),
   seats: z.number().int().min(1).max(20),
   transmission: z.enum(["MANUAL", "AUTOMATIC"]),
   fuel: z.enum(["BENSIN", "DIESEL", "ELECTRIC", "HYBRID"]),
   description: z.string().optional().default(""),
-  features: z.array(z.string()).default([]),
   imageUrl: z.string().optional(),
-  images: z.array(z.string()).default([]),
   isAvailable: z.boolean().default(true),
+  withDriverOnly: z.boolean().default(false),
 });
 
 export const bookingSchema = z.object({
@@ -47,6 +45,11 @@ export const blogSchema = z.object({
   content: z.string().min(10, "Konten minimal 10 karakter"),
   excerpt: z.string().min(10, "Ringkasan minimal 10 karakter"),
   imageUrl: z.string().optional(),
+  category: z.string().optional(),
+  tags: z.string().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  publishedAt: z.string().optional().nullable(),
   isPublished: z.boolean().default(false),
 });
 

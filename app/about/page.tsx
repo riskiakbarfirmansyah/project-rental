@@ -125,10 +125,10 @@ export default async function AboutPage() {
           {/* Value Cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginTop: "2.5rem" }}>
             {[
-              { icon: "🛡️", title: "Keamanan", desc: "Armada berstandar keamanan tinggi" },
-              { icon: "⭐", title: "Kualitas", desc: "Perawatan rutin setiap bulan" },
-              { icon: "💎", title: "Premium", desc: "Pengalaman berkendara mewah" },
-              { icon: "🤝", title: "Kepercayaan", desc: "5000+ pelanggan puas" },
+              { icon: "🛡️", title: config.about_val1_title || "Keamanan", desc: config.about_val1_desc || "Armada berstandar keamanan tinggi" },
+              { icon: "⭐", title: config.about_val2_title || "Kualitas", desc: config.about_val2_desc || "Perawatan rutin setiap bulan" },
+              { icon: "💎", title: config.about_val3_title || "Premium", desc: config.about_val3_desc || "Pengalaman berkendara mewah" },
+              { icon: "🤝", title: config.about_val4_title || "Kepercayaan", desc: config.about_val4_desc || "5000+ pelanggan puas" },
             ].map((v) => (
               <div key={v.title} style={{
                 padding: "1.5rem", borderRadius: "var(--radius-lg)",
@@ -156,34 +156,34 @@ export default async function AboutPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem" }}>
             {[
               {
-                title: "Pilihan Waktu Sewa",
+                title: config.about_srv1_title || "Pilihan Waktu Sewa",
                 icon: "📅",
-                desc: "Harian / Mingguan / Bulanan / Tahunan"
+                desc: config.about_srv1_desc || "Harian / Mingguan / Bulanan / Tahunan"
               },
               {
-                title: "Opsi Pengemudi",
+                title: config.about_srv2_title || "Opsi Pengemudi",
                 icon: "🔑",
-                desc: "Dengan Driver / Non-Driver (Lepas Kunci)"
+                desc: config.about_srv2_desc || "Dengan Driver / Non-Driver (Lepas Kunci)"
               },
               {
-                title: "Paket Lengkap All In",
+                title: config.about_srv3_title || "Paket Lengkap All In",
                 icon: "⛽",
-                desc: "Sudah Termasuk Unit Mobil, Driver & Bahan Bakar (BBM)"
+                desc: config.about_srv3_desc || "Sudah Termasuk Unit Mobil, Driver & Bahan Bakar (BBM)"
               },
               {
-                title: "Kategori Perjalanan",
+                title: config.about_srv4_title || "Kategori Perjalanan",
                 icon: "🏢",
-                desc: "Perseorangan / Perusahaan / Instansi / Dinas / Perjalanan Bisnis"
+                desc: config.about_srv4_desc || "Perseorangan / Perusahaan / Instansi / Dinas / Perjalanan Bisnis"
               },
               {
-                title: "Kesiapan Layanan",
+                title: config.about_srv5_title || "Kesiapan Layanan",
                 icon: "🕐",
-                desc: "Layanan Operasional Siap 24 Jam per 7 Hari Seminggu"
+                desc: config.about_srv5_desc || "Layanan Operasional Siap 24 Jam per 7 Hari Seminggu"
               },
               {
-                title: "Layanan Transportasi Hub",
+                title: config.about_srv6_title || "Layanan Transportasi Hub",
                 icon: "✈️",
-                desc: "Antar-Jemput Bandara, Stasiun Kereta Api, dan Pelabuhan"
+                desc: config.about_srv6_desc || "Antar-Jemput Bandara, Stasiun Kereta Api, dan Pelabuhan"
               }
             ].map((s) => (
               <div key={s.title} style={{
@@ -224,19 +224,19 @@ export default async function AboutPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem" }}>
             {[
               {
-                title: "Perawatan Bengkel Resmi",
+                title: config.about_grt1_title || "Perawatan Bengkel Resmi",
                 icon: "🔧",
-                desc: "Setiap unit armada diservis secara berkala hanya di bengkel dealer resmi untuk memastikan performa mesin dan fitur keselamatan berkendara selalu dalam kondisi 100% prima."
+                desc: config.about_grt1_desc || "Setiap unit armada diservis secara berkala hanya di bengkel dealer resmi untuk memastikan performa mesin dan fitur keselamatan berkendara selalu dalam kondisi 100% prima."
               },
               {
-                title: "Kabin Steril & Harum",
+                title: config.about_grt2_title || "Kabin Steril & Harum",
                 icon: "✨",
-                desc: "Jaminan kebersihan maksimal. Kabin mobil disemprot disinfektan sebelum diserahkan, bebas dari bekas asap rokok, harum segar mewah, dan bersih layaknya mobil baru."
+                desc: config.about_grt2_desc || "Jaminan kebersihan maksimal. Kabin mobil disemprot disinfektan sebelum diserahkan, bebas dari bekas asap rokok, harum segar mewah, dan bersih layaknya mobil baru."
               },
               {
-                title: "Layanan Darurat 24 Jam",
+                title: config.about_grt3_title || "Layanan Darurat 24 Jam",
                 icon: "🛡️",
-                desc: "Bantuan darurat di jalan raya (roadside assistance) siaga 24/7 beserta jaminan penggantian unit cadangan instan jika terjadi kendala teknis tak terduga selama masa sewa."
+                desc: config.about_grt3_desc || "Bantuan darurat di jalan raya (roadside assistance) siaga 24/7 beserta jaminan penggantian unit cadangan instan jika terjadi kendala teknis tak terduga selama masa sewa."
               }
             ].map((g) => (
               <div key={g.title} className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>

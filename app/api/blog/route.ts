@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const parsed = blogSchema.safeParse(body);
     if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
-    const { title, slug, ...rest } = parsed.data;
+    const { title, slug, publishedAt, ...rest } = parsed.data;
     const finalSlug = slug || generateSlug(title);
 
     const existing = await prisma.blogPost.findUnique({ where: { slug: finalSlug } });
@@ -54,7 +54,13 @@ export async function POST(request: NextRequest) {
     }
 
     const post = await prisma.blogPost.create({
-      data: { title, slug: finalSlug, ...rest, authorId: auth.user.id },
+      data: { 
+        title, 
+        slug: finalSlug, 
+        ...rest, 
+        publishedAt: publishedAt ? new Date(publishedAt) : null,
+        authorId: auth.user.id 
+      },
       include: { author: { select: { id: true, name: true } } },
     });
 

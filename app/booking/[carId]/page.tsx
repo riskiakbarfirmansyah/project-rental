@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 interface Car {
   id: string; name: string; brand: string; year: number; type: string;
   pricePerDay: number; seats: number; transmission: string; fuel: string;
-  description: string; features: string; imageUrl?: string;
+  description: string; withDriverOnly: boolean; imageUrl?: string;
 }
 
 interface AdminContact {
@@ -43,8 +43,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
   // Admin 1 diambil dari config (bisa diubah dari admin panel), Admin 2 fixed
   const [admins, setAdmins] = useState<AdminContact[]>([
     { label: "Admin 1", wa: "6281234567890" },
-    { label: "Admin 2", wa: "62895633818676" },
-    { label: "Admin 3", wa: "6285640802650" },
+    { label: "Admin 2", wa: "62895633818676" }
   ]);
   const [selectedAdminIdx, setSelectedAdminIdx] = useState(0);
   const adminWa = admins[selectedAdminIdx]?.wa || admins[0].wa;
@@ -55,6 +54,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
   const [successBookingId, setSuccessBookingId] = useState("");
   const [successWaUrl, setSuccessWaUrl] = useState("");
   const [copied, setCopied] = useState(false);
+  const [config, setConfig] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     customerName: "",
     customerWa: "",
@@ -69,8 +69,17 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
       fetch(`/api/cars/${carId}`).then((r) => r.json()),
       fetch("/api/config").then((r) => r.json()),
     ]).then(([carData, cfgData]) => {
-      if (carData.success) setCar(carData.data.car);
-      const wa = cfgData.data?.config?.whatsapp;
+      if (carData.success) {
+        setCar(carData.data.car);
+        if (carData.data.car.withDriverOnly) {
+          setForm(prev => ({ ...prev, driverOption: "dengan_supir" }));
+        }
+      }
+      
+      const configData = cfgData.data?.config || {};
+      setConfig(configData);
+
+      const wa = configData.whatsapp;
       if (wa) {
         setAdmins((prev) => {
           const updated = [...prev];
@@ -167,7 +176,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
   };
 
   const today = new Date().toISOString().split("T")[0];
-  const features: string[] = (() => { try { return JSON.parse(car?.features || "[]"); } catch { return []; } })();
+
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -246,18 +255,6 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                     </div>
                   ))}
                 </div>
-
-                {features.length > 0 && (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
-                    {features.map((f) => (
-                      <span key={f} style={{
-                        padding: "0.25rem 0.625rem",
-                        background: "var(--primary-light)", color: "var(--primary)",
-                        borderRadius: "var(--radius-full)", fontSize: "0.75rem", fontWeight: 600
-                      }}>✓ {f}</span>
-                    ))}
-                  </div>
-                )}
 
                 {/* Admin contact - mengikuti admin yang dipilih di form */}
                 <div style={{
@@ -434,7 +431,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   <label className="form-label">
                     🔑 Pilihan Sewa <span style={{ color: "var(--error)" }}>*</span>
                   </label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: car.withDriverOnly ? "1fr" : "1fr 1fr", gap: "0.75rem" }}>
                     {[
                       {
                         value: "lepas_kunci",
@@ -448,7 +445,9 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                         title: "Dengan Supir",
                         desc: "Sudah termasuk supir"
                       },
-                    ].map((opt) => (
+                    ].map((opt) => {
+                      if (car.withDriverOnly && opt.value === "lepas_kunci") return null;
+                      return (
                       <label key={opt.value} id={`driver-opt-${opt.value}`}
                         htmlFor={`radio-${opt.value}`}
                         style={{
@@ -474,8 +473,15 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                         }}>{opt.title}</span>
                         <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{opt.desc}</span>
                       </label>
-                    ))}
+                      );
+                    })}
                   </div>
+                  {car.withDriverOnly && (
+                    <div style={{ fontSize: "0.8125rem", color: "#b91c1c", marginTop: "0.75rem", display: "flex", gap: "0.5rem", alignItems: "center", background: "#fef2f2", padding: "0.75rem 1rem", borderRadius: "8px", border: "1px solid #fecaca" }}>
+                      <span style={{ fontSize: "1.125rem" }}>ℹ️</span> 
+                      <span>Mobil ini merupakan armada khusus yang hanya dapat disewa beserta supir demi kenyamanan dan keamanan Anda.</span>
+                    </div>
+                  )}
                 </div>
 
                 {error && (
@@ -498,6 +504,37 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   </div>
                   <div style={{ fontFamily: "Sora, sans-serif", fontWeight: 800, fontSize: "1.625rem", color: "#fbbf24" }}>
                     Rp {totalPrice.toLocaleString("id-ID")}
+                  </div>
+                </div>
+
+                {/* Info Discount Note */}
+                <div style={{ 
+                  display: "flex", alignItems: "flex-start", gap: "0.875rem", 
+                  padding: "1rem 1.25rem", background: "#f0f9ff", 
+                  borderRadius: "var(--radius-md)", border: "1px solid #bae6fd" 
+                }}>
+                  <div style={{ fontSize: "1.25rem", marginTop: "-0.15rem" }}>💡</div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: "0.875rem", color: "#0369a1", marginBottom: "0.375rem" }}>
+                      {config.booking_promo_title || "Promo & Potongan Harga Khusus"}
+                    </div>
+                    <div style={{ fontSize: "0.8125rem", color: "#0c4a6e", lineHeight: 1.6 }}>
+                      {(() => {
+                        const promoParts = (config.booking_promo_desc || "Dapatkan harga spesial (lebih hemat dari estimasi) untuk kondisi berikut: * Penyewaan lebih dari 7 hari * Penyewa yang sedang berulang tahun * Klaim diskon ke admin via WhatsApp setelah pesanan dikirim!").split("*").map(s => s.trim()).filter(Boolean);
+                        return (
+                          <>
+                            {promoParts[0]}
+                            {promoParts.length > 1 && (
+                              <ul style={{ margin: "0.25rem 0 0.5rem 1.25rem", padding: 0 }}>
+                                {promoParts.slice(1).map((pt, i) => (
+                                  <li key={i} style={{ paddingLeft: "0.25rem", marginBottom: "0.125rem" }}>{pt}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
 

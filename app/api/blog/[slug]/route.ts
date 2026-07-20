@@ -35,7 +35,12 @@ export async function PUT(
     const parsed = blogSchema.partial().safeParse(body);
     if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
-    const post = await prisma.blogPost.update({ where: { slug }, data: parsed.data });
+    const dataToUpdate: any = { ...parsed.data };
+    if (dataToUpdate.publishedAt !== undefined) {
+      dataToUpdate.publishedAt = dataToUpdate.publishedAt ? new Date(dataToUpdate.publishedAt) : null;
+    }
+
+    const post = await prisma.blogPost.update({ where: { slug }, data: dataToUpdate });
     return successResponse({ post });
   } catch (error) {
     console.error("Update post error:", error);

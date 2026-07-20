@@ -7,24 +7,17 @@ import Footer from "@/components/Footer";
 interface Car {
   id: string; name: string; brand: string; year: number; type: string;
   pricePerDay: number; seats: number; transmission: string; fuel: string;
-  description: string; features: string; imageUrl?: string; isAvailable: boolean;
+  description: string; imageUrl?: string; isAvailable: boolean;
 }
-
-const CAR_TYPES = ["Semua", "SEDAN", "SUV", "MPV", "PICKUP", "MINIBUS", "SPORT"];
-const TYPE_LABELS: Record<string, string> = {
-  SEDAN: "Sedan", SUV: "SUV", MPV: "MPV", PICKUP: "Pickup", MINIBUS: "Minibus", SPORT: "Sport"
-};
 
 export default function ServicesPage() {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
-  const [type, setType] = useState("Semua");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("default");
 
   useEffect(() => {
     const params = new URLSearchParams({ limit: "50" });
-    if (type !== "Semua") params.set("type", type);
     if (search) params.set("search", search);
 
     setLoading(true);
@@ -37,7 +30,7 @@ export default function ServicesPage() {
         setCars(data);
       })
       .finally(() => setLoading(false));
-  }, [type, search, sort]);
+  }, [search, sort]);
 
   return (
     <>
@@ -65,21 +58,6 @@ export default function ServicesPage() {
               className="form-control" id="filter-search"
               style={{ flex: 1, minWidth: 200, maxWidth: 300 }}
             />
-            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              {CAR_TYPES.map((t) => (
-                <button key={t} onClick={() => setType(t)} id={`filter-type-${t}`}
-                  style={{
-                    padding: "0.5rem 1rem", borderRadius: "var(--radius-full)",
-                    border: "1.5px solid", cursor: "pointer", fontWeight: 600,
-                    fontSize: "0.875rem", transition: "var(--transition)",
-                    background: type === t ? "var(--primary)" : "transparent",
-                    borderColor: type === t ? "var(--primary)" : "var(--border)",
-                    color: type === t ? "white" : "var(--text-secondary)",
-                  }}>
-                  {TYPE_LABELS[t] || t}
-                </button>
-              ))}
-            </div>
             <select value={sort} onChange={(e) => setSort(e.target.value)}
               className="form-control" id="filter-sort" style={{ width: "auto", minWidth: 150 }}>
               <option value="default">Urutkan</option>
@@ -119,8 +97,6 @@ export default function ServicesPage() {
 }
 
 function ServiceCarCard({ car }: { car: Car }) {
-  const features: string[] = (() => { try { return JSON.parse(car.features) || []; } catch { return []; } })();
-
   return (
     <div className="car-card" id={`service-car-${car.id}`}>
       <div className="car-card-img-placeholder">
@@ -148,7 +124,6 @@ function ServiceCarCard({ car }: { car: Car }) {
           <div>
             <h3 style={{ fontSize: "1.0625rem", marginBottom: "0.25rem" }}>{car.brand} {car.name}</h3>
             <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span className="badge badge-primary">{TYPE_LABELS[car.type] || car.type}</span>
               <span className="badge" style={{ background: "var(--surface-2)", color: "var(--text-secondary)" }}>
                 {car.year}
               </span>
@@ -161,24 +136,6 @@ function ServiceCarCard({ car }: { car: Car }) {
           <span>⚙️ {car.transmission === "AUTOMATIC" ? "Matic" : "Manual"}</span>
           <span>⛽ {car.fuel}</span>
         </div>
-
-        {features.length > 0 && (
-          <div style={{ display: "flex", gap: "0.375rem", flexWrap: "wrap", marginBottom: "1rem" }}>
-            {features.slice(0, 3).map((f: string) => (
-              <span key={f} style={{
-                padding: "0.2rem 0.6rem", background: "var(--surface-2)",
-                borderRadius: "var(--radius-sm)", fontSize: "0.75rem", color: "var(--text-secondary)"
-              }}>
-                {f}
-              </span>
-            ))}
-            {features.length > 3 && (
-              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", padding: "0.2rem 0" }}>
-                +{features.length - 3} lagi
-              </span>
-            )}
-          </div>
-        )}
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div className="car-price">

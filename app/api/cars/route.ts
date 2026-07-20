@@ -60,13 +60,8 @@ export async function POST(request: NextRequest) {
     const parsed = carSchema.safeParse(body);
     if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
-    const { features, images, ...rest } = parsed.data;
     const car = await prisma.car.create({
-      data: {
-        ...rest,
-        features: JSON.stringify(features),
-        images: JSON.stringify(images),
-      },
+      data: parsed.data,
     });
 
     return successResponse({ car }, 201);

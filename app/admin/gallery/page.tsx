@@ -12,18 +12,26 @@ interface GalleryItem {
 }
 
 const EMPTY_FORM = { title: "", description: "", imageUrl: "" };
+const EMPTY_ADD_FORM = { title: "", description: "" };
 
 export default function AdminGalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [uploading, setUploading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+
+  // --- Add Modal States ---
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState(EMPTY_ADD_FORM);
+  const [addFile, setAddFile] = useState<File | null>(null);
+  const [addPreviewUrl, setAddPreviewUrl] = useState<string | null>(null);
+  const [addUploading, setAddUploading] = useState(false);
+  const [addError, setAddError] = useState("");
+  const addFileRef = useRef<HTMLInputElement>(null);
+
+  // --- Edit Modal States ---
   const [editItem, setEditItem] = useState<GalleryItem | null>(null);
   const [editForm, setEditForm] = useState(EMPTY_FORM);
   const [editUploading, setEditUploading] = useState(false);
   const [editSubmitting, setEditSubmitting] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
   const editFileRef = useRef<HTMLInputElement>(null);
 
   // Client-side search state
@@ -39,19 +47,126 @@ export default function AdminGalleryPage() {
 
   useEffect(() => { load(); }, []);
 
-  // Upload for Add form
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const fd = new FormData(); fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    const data = await res.json();
-    if (data.success) setForm((f) => ({ ...f, imageUrl: data.data.url }));
-    setUploading(false);
+  // Keyboard accessibility for modals
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (showAddModal && !addUploading) closeAddModal();
+        if (editItem && !editUploading && !editSubmitting) setEditItem(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showAddModal, addUploading, editItem, editUploading, editSubmitting]);
+
+  // Cleanup object URLs to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      if (addPreviewUrl) URL.revokeObjectURL(addPreviewUrl);
+    };
+  }, [addPreviewUrl]);
+
+  // --- Add Handlers ---
+  const openAddModal = () => {
+    setAddForm(EMPTY_ADD_FORM);
+    setAddFile(null);
+    if (addPreviewUrl) URL.revokeObjectURL(addPreviewUrl);
+    setAddPreviewUrl(null);
+    setAddError("");
+    setShowAddModal(true);
   };
 
-  // Upload for Edit form
+  const closeAddModal = () => {
+    setShowAddModal(false);
+    setTimeout(() => {
+      setAddForm(EMPTY_ADD_FORM);
+      setAddFile(null);
+      if (addPreviewUrl) URL.revokeObjectURL(addPreviewUrl);
+      setAddPreviewUrl(null);
+      setAddError("");
+    }, 300);
+  };
+
+  const handleAddFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAddError("");
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate type
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      setAddError("Format file tidak didukung. Gunakan JPG, PNG, atau WEBP.");
+      return;
+    }
+
+    // Validate size (e.g., max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setAddError("Ukuran file terlalu besar (Maksimal 5MB).");
+      return;
+    }
+
+    // Free memory of old preview
+    if (addPreviewUrl) URL.revokeObjectURL(addPreviewUrl);
+
+    setAddFile(file);
+    setAddPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleRemoveAddFile = () => {
+    setAddFile(null);
+    if (addPreviewUrl) URL.revokeObjectURL(addPreviewUrl);
+    setAddPreviewUrl(null);
+    if (addFileRef.current) addFileRef.current.value = "";
+  };
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddError("");
+
+    if (!addFile) {
+      setAddError("Silakan pilih file foto terlebih dahulu.");
+      return;
+    }
+    if (!addForm.title.trim()) {
+      setAddError("Judul wajib diisi.");
+      return;
+    }
+
+    setAddUploading(true);
+
+    try {
+      // 1. Upload Image
+      const fd = new FormData();
+      fd.append("file", addFile);
+      const resUpload = await fetch("/api/upload", { method: "POST", body: fd });
+      const dataUpload = await resUpload.json();
+
+      if (!dataUpload.success) throw new Error(dataUpload.error || "Gagal mengunggah foto");
+
+      // 2. Save Item
+      const resGallery = await fetch("/api/gallery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...addForm, imageUrl: dataUpload.data.url }),
+      });
+
+      if (!resGallery.ok) {
+        const errData = await resGallery.json();
+        throw new Error(errData.error || "Gagal menyimpan data galeri");
+      }
+
+      alert("Foto berhasil ditambahkan!");
+      closeAddModal();
+      load();
+    } catch (err: any) {
+      setAddError(err.message || "Terjadi kesalahan sistem");
+    } finally {
+      setAddUploading(false);
+    }
+  };
+
+  // --- Edit Handlers ---
   const handleEditUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -61,19 +176,6 @@ export default function AdminGalleryPage() {
     const data = await res.json();
     if (data.success) setEditForm((f) => ({ ...f, imageUrl: data.data.url }));
     setEditUploading(false);
-  };
-
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.imageUrl) return alert("Upload gambar terlebih dahulu");
-    setSubmitting(true);
-    const res = await fetch("/api/gallery", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    if (res.ok) { setForm(EMPTY_FORM); load(); }
-    setSubmitting(false);
   };
 
   const openEdit = (item: GalleryItem) => {
@@ -101,6 +203,12 @@ export default function AdminGalleryPage() {
     load();
   };
 
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024, sizes = ["Bytes", "KB", "MB"], i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
   // Filtered gallery items based on search
   const filteredItems = items.filter((item) => {
     return (
@@ -120,51 +228,6 @@ export default function AdminGalleryPage() {
           color: var(--text-primary);
           font-size: 2rem;
           letter-spacing: -0.02em;
-        }
-        .gallery-uploader-panel {
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: 20px;
-          padding: 1.5rem;
-          box-shadow: var(--shadow-sm);
-        }
-        .gallery-upload-form {
-          display: grid;
-          grid-template-columns: 1.2fr 1.5fr 1fr auto;
-          gap: 1.25rem;
-          align-items: flex-end;
-        }
-        @media (max-width: 992px) {
-          .gallery-upload-form {
-            grid-template-columns: 1fr 1fr;
-          }
-          .gallery-upload-form button[type="submit"] {
-            grid-column: span 2;
-          }
-        }
-        @media (max-width: 576px) {
-          .gallery-upload-form {
-            grid-template-columns: 1fr;
-          }
-          .gallery-upload-form button[type="submit"] {
-            grid-column: span 1;
-          }
-        }
-        .upload-input-box {
-          position: relative;
-          background: var(--surface-2);
-          border: 1px solid var(--border);
-          border-radius: 12px;
-          padding: 0.75rem 1rem;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          cursor: pointer;
-          transition: var(--transition);
-        }
-        .upload-input-box:hover {
-          border-color: var(--primary);
-          background: var(--surface);
         }
         .search-container-gallery {
           position: relative;
@@ -315,18 +378,6 @@ export default function AdminGalleryPage() {
           from { transform: scale(0.96); opacity: 0; }
           to { transform: scale(1); opacity: 1; }
         }
-        .preview-bubble {
-          width: 36px;
-          height: 36px;
-          border-radius: 6px;
-          overflow: hidden;
-          position: relative;
-          border: 1px solid var(--border);
-          background: white;
-        }
-        .preview-bubble img {
-          object-fit: cover;
-        }
       ` }} />
 
       {/* ── TOP HEADER SECTION ── */}
@@ -337,85 +388,20 @@ export default function AdminGalleryPage() {
             Kelola foto dokumentasi armada mobil dan aktivitas sewa untuk galeri website.
           </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--primary-light)", padding: "0.5rem 1rem", borderRadius: "10px" }}>
-          <span style={{ fontSize: "1.25rem" }}>🖼️</span>
-          <span style={{ fontWeight: 700, fontSize: "0.875rem" }}>{items.length} Foto Aktif</span>
-        </div>
-      </div>
-
-      {/* ── ADD NEW PHOTO FORM ── */}
-      <div className="gallery-uploader-panel">
-        <h3 style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "Sora, sans-serif", marginBottom: "1.25rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)" }}>
-          Tambah Foto Baru
-        </h3>
-        
-        <form onSubmit={handleAdd} className="gallery-upload-form">
-          {/* Judul */}
-          <div className="form-group" style={{ margin: 0, display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-            <label className="form-label" htmlFor="gallery-title" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Judul *</label>
-            <input
-              id="gallery-title"
-              className="form-control"
-              placeholder="Contoh: Unit Avanza 2025"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              required
-              style={{ borderRadius: "10px" }}
-            />
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--primary-light)", padding: "0.5rem 1rem", borderRadius: "10px", color: "var(--primary)" }}>
+            <span style={{ fontSize: "1.25rem" }}>🖼️</span>
+            <span style={{ fontWeight: 700, fontSize: "0.875rem" }}>{items.length} Foto Aktif</span>
           </div>
-
-          {/* Deskripsi */}
-          <div className="form-group" style={{ margin: 0, display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-            <label className="form-label" htmlFor="gallery-desc" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Deskripsi Singkat</label>
-            <input
-              id="gallery-desc"
-              className="form-control"
-              placeholder="Contoh: Kondisi dalam mobil bersih dan wangi"
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              style={{ borderRadius: "10px" }}
-            />
-          </div>
-
-          {/* Upload Button */}
-          <div className="form-group" style={{ margin: 0, display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-            <label className="form-label" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>File Foto *</label>
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-              <input
-                type="file"
-                ref={fileRef}
-                accept="image/*"
-                onChange={handleUpload}
-                style={{ display: "none" }}
-                id="gallery-file"
-              />
-              
-              <div className="upload-input-box" onClick={() => fileRef.current?.click()} style={{ flex: 1 }}>
-                <span>📁</span>
-                <span id="gallery-upload-btn" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
-                  {uploading ? "Mengupload..." : "Pilih File"}
-                </span>
-              </div>
-
-              {form.imageUrl && (
-                <div className="preview-bubble" title="Pratinjau gambar">
-                  <Image src={form.imageUrl} alt="Upload Preview" fill />
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={submitting || uploading}
-            id="gallery-add-btn"
-            style={{ borderRadius: "12px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center" }}
+          <button 
+            className="btn btn-primary" 
+            onClick={openAddModal}
+            style={{ borderRadius: "10px", height: "40px", padding: "0 1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
           >
-            {submitting ? "Menyimpan..." : "✓ Tambahkan Foto"}
+            <span>+</span>
+            <span>Tambah Foto</span>
           </button>
-        </form>
+        </div>
       </div>
 
       {/* ── SEARCH & GRID BAR ── */}
@@ -493,11 +479,155 @@ export default function AdminGalleryPage() {
         </div>
       )}
 
+      {/* ── ADD PHOTO MODAL ── */}
+      {showAddModal && (
+        <div
+          className="custom-modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !addUploading) closeAddModal();
+          }}
+        >
+          <div className="custom-modal-window">
+            {/* Modal Header */}
+            <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ fontSize: "1.125rem", fontWeight: 800, margin: 0, fontFamily: "Sora, sans-serif" }}>
+                Tambah Foto Baru
+              </h3>
+              <button
+                onClick={closeAddModal}
+                disabled={addUploading}
+                style={{ background: "none", border: "none", cursor: addUploading ? "not-allowed" : "pointer", fontSize: "1.125rem", color: "var(--text-muted)" }}
+                aria-label="Tutup"
+              >✕</button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: "1.5rem" }}>
+              {addError && (
+                <div style={{ padding: "0.75rem", marginBottom: "1.25rem", background: "var(--error-light)", color: "var(--error)", borderRadius: "8px", fontSize: "0.875rem" }}>
+                  {addError}
+                </div>
+              )}
+
+              <form onSubmit={handleAddSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                
+                {/* File Upload Area */}
+                <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                  <label className="form-label" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>File Foto *</label>
+                  
+                  {addPreviewUrl && addFile ? (
+                    <div style={{ position: "relative", width: "100%", borderRadius: "12px", overflow: "hidden", background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", flexDirection: "column" }}>
+                      <div style={{ position: "relative", height: 200, width: "100%" }}>
+                        <Image
+                          src={addPreviewUrl}
+                          alt="Preview"
+                          fill
+                          style={{ objectFit: "cover" }}
+                          sizes="520px"
+                        />
+                      </div>
+                      <div style={{ padding: "0.75rem 1rem", background: "var(--surface)", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ overflow: "hidden" }}>
+                          <div style={{ fontSize: "0.875rem", fontWeight: 600, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{addFile.name}</div>
+                          <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{formatFileSize(addFile.size)}</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRemoveAddFile}
+                          disabled={addUploading}
+                          className="btn btn-outline btn-sm"
+                          style={{ color: "var(--error)", borderColor: "var(--error-light)" }}
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div 
+                      onClick={() => addFileRef.current?.click()}
+                      style={{ 
+                        border: "2px dashed var(--border)", borderRadius: "12px", padding: "2.5rem 1rem", 
+                        textAlign: "center", cursor: "pointer", background: "var(--surface-2)", transition: "var(--transition)"
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.borderColor = "var(--primary)"}
+                      onMouseOut={(e) => e.currentTarget.style.borderColor = "var(--border)"}
+                    >
+                      <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📁</div>
+                      <div style={{ fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.25rem" }}>Klik untuk memilih foto</div>
+                      <div style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>Maks. 5MB (JPG, PNG, WEBP)</div>
+                    </div>
+                  )}
+
+                  <input
+                    type="file"
+                    ref={addFileRef}
+                    accept="image/jpeg, image/png, image/webp, image/jpg"
+                    onChange={handleAddFileSelect}
+                    style={{ display: "none" }}
+                    id="add-gallery-file"
+                  />
+                </div>
+
+                {/* Title */}
+                <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                  <label className="form-label" htmlFor="add-gallery-title" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Judul *</label>
+                  <input
+                    id="add-gallery-title"
+                    className="form-control"
+                    placeholder="Contoh: Eksterior Avanza 2025"
+                    value={addForm.title}
+                    onChange={(e) => { setAddForm({ ...addForm, title: e.target.value }); if(addError) setAddError(""); }}
+                    required
+                    style={{ borderRadius: "10px" }}
+                  />
+                </div>
+
+                {/* Description */}
+                <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                  <label className="form-label" htmlFor="add-gallery-desc" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Deskripsi / Caption (Opsional)</label>
+                  <input
+                    id="add-gallery-desc"
+                    className="form-control"
+                    placeholder="Masukkan deskripsi singkat..."
+                    value={addForm.description}
+                    onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
+                    style={{ borderRadius: "10px" }}
+                  />
+                </div>
+
+                {/* Modal actions */}
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "0.5rem", borderTop: "1px solid var(--border)", paddingTop: "1.25rem" }}>
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    onClick={closeAddModal}
+                    disabled={addUploading}
+                    style={{ borderRadius: "10px", padding: "0.65rem 1.25rem" }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={addUploading || !addFile || !addForm.title.trim()}
+                    style={{ borderRadius: "10px", padding: "0.65rem 1.25rem" }}
+                  >
+                    {addUploading ? "Mengunggah..." : "Unggah Foto"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── EDIT PHOTO MODAL ── */}
       {editItem && (
         <div
           className="custom-modal-backdrop"
-          onClick={(e) => e.target === e.currentTarget && setEditItem(null)}
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !editUploading && !editSubmitting) setEditItem(null);
+          }}
         >
           <div className="custom-modal-window">
             {/* Modal Header */}
@@ -507,7 +637,8 @@ export default function AdminGalleryPage() {
               </h3>
               <button
                 onClick={() => setEditItem(null)}
-                style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.125rem", color: "var(--text-muted)" }}
+                disabled={editUploading || editSubmitting}
+                style={{ background: "none", border: "none", cursor: (editUploading || editSubmitting) ? "not-allowed" : "pointer", fontSize: "1.125rem", color: "var(--text-muted)" }}
                 id="close-edit-gallery-modal"
               >✕</button>
             </div>
@@ -570,6 +701,7 @@ export default function AdminGalleryPage() {
                       onClick={() => editFileRef.current?.click()}
                       className="btn btn-outline btn-sm"
                       id="edit-gallery-upload-btn"
+                      disabled={editUploading || editSubmitting}
                       style={{ borderRadius: "10px", padding: "0.5rem 1rem" }}
                     >
                       {editUploading ? "⏳ Mengupload..." : "📁 Ganti Foto"}
@@ -586,6 +718,7 @@ export default function AdminGalleryPage() {
                     type="button"
                     className="btn btn-outline"
                     onClick={() => setEditItem(null)}
+                    disabled={editUploading || editSubmitting}
                     id="cancel-edit-gallery"
                     style={{ borderRadius: "10px", padding: "0.65rem 1.25rem" }}
                   >

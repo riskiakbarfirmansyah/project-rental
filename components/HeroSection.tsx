@@ -69,7 +69,7 @@ export default function HeroSection({
             </div>
 
             {/* Quick stats */}
-            <div className="hero-quick-stats">
+            <div className="hero-quick-stats" style={{ marginBottom: "0.5rem" }}>
               <div className="hero-quick-stat">
                 <div className="hero-quick-stat-num">Tahun Muda</div>
                 <div className="hero-quick-stat-label">Armada Terbaru</div>
@@ -86,9 +86,13 @@ export default function HeroSection({
               </div>
               <div className="hero-quick-stat-sep" />
               <div className="hero-quick-stat">
-                <div className="hero-quick-stat-num">Gratis</div>
+                <div className="hero-quick-stat-num">Gratis*</div>
                 <div className="hero-quick-stat-label">Antar-Jemput</div>
               </div>
+            </div>
+            
+            <div style={{ fontSize: "0.6875rem", color: "rgba(255,255,255,0.4)", fontStyle: "italic", marginLeft: "2px" }}>
+              *Syarat dan ketentuan berlaku untuk area tertentu
             </div>
           </div>
 
@@ -101,7 +105,7 @@ export default function HeroSection({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/hero-car.png"
-                alt="Honda Brio RS"
+                alt="Toyota Avanza"
                 style={{
                   position: "relative",
                   zIndex: 1,

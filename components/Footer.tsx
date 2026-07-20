@@ -94,18 +94,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Layanan */}
-          <div className="footer-column">
-            <h4>Layanan</h4>
-            <div className="footer-links">
-              {serviceLinks.map((l) => (
-                <Link key={l.href} href={l.href}>
-                  {l.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
           {/* Kontak */}
           <div className="footer-column">
             <h4>Kontak</h4>
@@ -118,7 +106,9 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <p>© {year} Bella Belly Trans Co. All rights reserved.</p>
+          <div>
+            <p>© {year} Bella Belly Trans Co. All rights reserved.</p>
+          </div>
           <div className="footer-bottom-links">
             <Link href="/privacy">Kebijakan Privasi</Link>
             <Link href="/terms">Syarat & Ketentuan</Link>

@@ -14,14 +14,7 @@ enum Role {
   CUSTOMER
 }
 
-enum CarType {
-  SEDAN
-  SUV
-  MPV
-  PICKUP
-  MINIBUS
-  SPORT
-}
+
 
 enum Transmission {
   MANUAL
@@ -64,16 +57,15 @@ model Car {
   name         String
   brand        String
   year         Int
-  type         CarType
+  type         String   @default("MOBIL")
   pricePerDay  Int
   seats        Int
   transmission Transmission
   fuel         FuelType
   description  String       @db.Text
-  features     String       @db.Text  // JSON string array
   imageUrl     String?
-  images       String?      @db.Text  // JSON array of image urls
   isAvailable  Boolean      @default(true)
+  withDriverOnly Boolean    @default(false)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
@@ -117,16 +109,21 @@ model Booking {
 }
 
 model BlogPost {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  content     String   @db.LongText
-  excerpt     String   @db.Text
-  imageUrl    String?
-  authorId    String
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  content         String    @db.LongText
+  excerpt         String    @db.Text
+  imageUrl        String?
+  category        String?
+  tags            String?
+  metaTitle       String?
+  metaDescription String?
+  publishedAt     DateTime?
+  authorId        String
+  isPublished     Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 

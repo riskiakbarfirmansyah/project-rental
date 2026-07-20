@@ -32,12 +32,7 @@ export async function PUT(
     const parsed = carSchema.partial().safeParse(body);
     if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
-    const { features, images, ...rest } = parsed.data;
-    const updateData: Record<string, unknown> = { ...rest };
-    if (features !== undefined) updateData.features = JSON.stringify(features);
-    if (images !== undefined) updateData.images = JSON.stringify(images);
-
-    const car = await prisma.car.update({ where: { id }, data: updateData });
+    const car = await prisma.car.update({ where: { id }, data: parsed.data });
     return successResponse({ car });
   } catch (error) {
     console.error("Update car error:", error);
