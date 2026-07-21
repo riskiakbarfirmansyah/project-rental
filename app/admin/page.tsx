@@ -13,6 +13,9 @@ interface Stats {
   completedBookings: number;
   cancelledBookings: number;
   totalRevenue: number;
+  totalPageViews: number;
+  todayPageViews: number;
+  uniqueVisitorsToday: number;
 }
 
 interface RecentBooking {
@@ -86,7 +89,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── STATS CARDS GRID (3 Columns) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem" }}>
         {[
           {
             label: "Total Armada Mobil",
@@ -164,6 +167,34 @@ export default function AdminDashboard() {
                   <div style={{
                     width: `${utilizationRate}%`,
                     height: "100%", background: "var(--success)", borderRadius: 3
+                  }} />
+                </div>
+              </div>
+            )
+          },
+          {
+            label: "Traffic Pengunjung",
+            value: stats?.totalPageViews?.toLocaleString("id-ID") || "0",
+            sub: `${stats?.uniqueVisitorsToday || 0} pengunjung unik hari ini`,
+            icon: (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            ),
+            color: "#8b5cf6",
+            extra: (
+              <div style={{ marginTop: "1rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: "0.25rem", fontWeight: 600 }}>
+                  <span>Kunjungan Hari Ini</span>
+                  <span>{stats?.todayPageViews || 0} views</span>
+                </div>
+                <div style={{ width: "100%", height: 6, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{
+                    width: `${stats && stats.totalPageViews > 0 ? Math.min(((stats.todayPageViews || 0) / Math.max(stats.totalPageViews / 30, 1)) * 100, 100) : 0}%`,
+                    height: "100%", background: "#8b5cf6", borderRadius: 3
                   }} />
                 </div>
               </div>

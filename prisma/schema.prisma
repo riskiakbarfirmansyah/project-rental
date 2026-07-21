@@ -195,3 +195,16 @@ model Review {
 
   @@map("reviews")
 }
+
+model PageView {
+  id        String   @id @default(cuid())
+  page      String
+  ipAddress String?
+  userAgent String?  @db.Text
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([page])
+  @@map("page_views")
+}

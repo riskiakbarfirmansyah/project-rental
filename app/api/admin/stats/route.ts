@@ -18,6 +18,9 @@ export async function GET() {
       cancelledBookings,
       unreadMessages,
       revenueData,
+      totalPageViews,
+      todayPageViews,
+      uniqueVisitorsToday,
     ] = await Promise.all([
       prisma.car.count(),
       prisma.car.count({ where: { isAvailable: true } }),
@@ -31,6 +34,14 @@ export async function GET() {
       prisma.booking.aggregate({
         _sum: { totalPrice: true },
         where: { status: { in: ["COMPLETED", "CONFIRMED"] } },
+      }),
+      prisma.pageView.count(),
+      prisma.pageView.count({
+        where: { createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } },
+      }),
+      prisma.pageView.groupBy({
+        by: ["ipAddress"],
+        where: { createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } },
       }),
     ]);
 
@@ -70,6 +81,9 @@ export async function GET() {
         cancelledBookings,
         unreadMessages,
         totalRevenue: revenueData._sum.totalPrice || 0,
+        totalPageViews,
+        todayPageViews,
+        uniqueVisitorsToday: uniqueVisitorsToday.length,
       },
       recentBookings: recentBookings.map((b) => ({
         id: b.id,
