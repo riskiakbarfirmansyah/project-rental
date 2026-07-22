@@ -3,32 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = { title: "Blog" };
 
-interface BlogPost {
-  id: string; 
-  title: string; 
-  slug: string; 
-  excerpt: string; 
-  imageUrl?: string | null; 
-  createdAt: string; 
-  publishedAt?: string | null;
-  category?: string | null;
-  author: { name: string };
-}
-
 export default async function BlogPage() {
-  let posts: BlogPost[] = [];
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/blog?limit=12`, { cache: "no-store" });
-    if (res.ok) { 
-      const d = await res.json(); 
-      posts = d.data?.posts || []; 
-    }
-  } catch (e) {
-    console.error("Failed to fetch blogs:", e);
-  }
+  const posts = await prisma.blogPost.findMany({
+    where: { isPublished: true },
+    include: { author: { select: { id: true, name: true, avatar: true } } },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+  });
 
   return (
     <>

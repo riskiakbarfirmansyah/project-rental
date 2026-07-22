@@ -5,52 +5,30 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import sanitizeHtml from "sanitize-html";
+import { prisma } from "@/lib/prisma";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/blog/${slug}`, { cache: "no-store" });
-    if (res.ok) { 
-      const d = await res.json(); 
-      const post = d.data?.post;
-      if (post) {
-        return { 
-          title: post.metaTitle || post.title || "Artikel",
-          description: post.metaDescription || post.excerpt
-        };
-      }
-    }
-  } catch (e) {
-    console.error("Meta fetch error:", e);
+  const post = await prisma.blogPost.findUnique({
+    where: { slug },
+    select: { title: true, excerpt: true, metaTitle: true, metaDescription: true },
+  });
+  if (post) {
+    return {
+      title: post.metaTitle || post.title || "Artikel",
+      description: post.metaDescription || post.excerpt,
+    };
   }
   return { title: "Artikel" };
 }
 
-interface BlogPostDetail {
-  title: string; 
-  content: string; 
-  excerpt: string; 
-  imageUrl?: string | null;
-  category?: string | null;
-  tags?: string | null;
-  createdAt: string; 
-  publishedAt?: string | null;
-  author: { name: string; avatar?: string | null };
-}
-
 export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  let post: BlogPostDetail | null = null;
-
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/blog/${slug}`, { cache: "no-store" });
-    if (res.ok) { 
-      const d = await res.json(); 
-      post = d.data?.post; 
-    }
-  } catch (e) {
-    console.error("Blog fetch error:", e);
-  }
+  
+  const post = await prisma.blogPost.findUnique({
+    where: { slug },
+    include: { author: { select: { id: true, name: true, avatar: true } } },
+  });
 
   if (!post) notFound();
 
