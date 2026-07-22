@@ -4,10 +4,13 @@ import { faqSchema } from "@/lib/validations";
 import { requireAdmin } from "@/lib/auth";
 import { successResponse, errorResponse } from "@/lib/utils";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const fetchAll = searchParams.get("all") === "true";
+    
     const faqs = await prisma.faqItem.findMany({
-      where: { isActive: true },
+      where: fetchAll ? {} : { isActive: true },
       orderBy: { order: "asc" },
     });
     return successResponse({ faqs });

@@ -53,7 +53,7 @@ export default async function ContactPage() {
             color: "rgba(255,255,255,0.6)", fontSize: "1.0625rem",
             maxWidth: 480, margin: "0 auto"
           }}>
-            Punya pertanyaan atau ingin memesan? Jangan ragu menghubungi kami — tim kami siap membantu.
+            Punya pertanyaan atau ingin memesan? Jangan ragu menghubungi kami karena tim kami siap membantu.
           </p>
         </div>
       </section>

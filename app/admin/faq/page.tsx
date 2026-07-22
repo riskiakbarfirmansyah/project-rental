@@ -17,7 +17,7 @@ export default function AdminFaqPage() {
   const load = () => {
     setLoading(true);
     // Fetch all including inactive for admin
-    fetch("/api/faq").then((r) => r.json()).then((d) => setFaqs(d.data?.faqs || [])).finally(() => setLoading(false));
+    fetch("/api/faq?all=true").then((r) => r.json()).then((d) => setFaqs(d.data?.faqs || [])).finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
 
@@ -29,9 +29,29 @@ export default function AdminFaqPage() {
     setSubmitting(true);
     const url = editing ? `/api/faq/${editing.id}` : "/api/faq";
     const method = editing ? "PUT" : "POST";
-    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, order: parseInt(form.order.toString()) }) });
-    if (res.ok) { setShowForm(false); load(); }
-    setSubmitting(false);
+    
+    const parsedOrder = parseInt(form.order?.toString() || "0");
+    const safeOrder = isNaN(parsedOrder) ? 0 : parsedOrder;
+
+    try {
+      const res = await fetch(url, { 
+        method, 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ ...form, order: safeOrder }) 
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.success) { 
+        setShowForm(false); 
+        load(); 
+      } else {
+        alert(data.error || "Gagal menyimpan FAQ");
+      }
+    } catch (err) {
+      alert("Terjadi kesalahan jaringan");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
