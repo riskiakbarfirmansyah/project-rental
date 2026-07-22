@@ -93,7 +93,7 @@ export default function Navbar() {
           {/* Actions */}
           <div className="navbar-actions">
             {user && user.role === "ADMIN" ? (
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <div className="navbar-desktop-actions" style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                 <Link href="/admin" className="btn btn-sm btn-primary" id="nav-admin">
                   Dashboard Admin
                 </Link>
@@ -146,8 +146,9 @@ export default function Navbar() {
         {/* Mobile dropdown */}
         {menuOpen && (
           <div style={{
-            borderTop: "1px solid var(--border)", padding: "1rem 0",
-            display: "flex", flexDirection: "column", gap: "0.25rem"
+            borderTop: "1px solid var(--border)", padding: "0.875rem 0",
+            display: "flex", flexDirection: "column", gap: "0.25rem",
+            animation: "fadeIn 0.2s ease"
           }}>
             {links.map((l) => (
               <Link key={l.href} href={l.href}
@@ -156,11 +157,28 @@ export default function Navbar() {
                   padding: "0.75rem 1rem", borderRadius: "var(--radius-md)",
                   color: pathname === l.href ? "var(--primary)" : "var(--text-secondary)",
                   background: pathname === l.href ? "var(--primary-light)" : "transparent",
-                  fontWeight: 500
+                  fontWeight: 600, fontSize: "0.9375rem"
                 }}>
                 {l.label}
               </Link>
             ))}
+
+            <div style={{ marginTop: "0.5rem", paddingTop: "0.75rem", borderTop: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              {user && user.role === "ADMIN" ? (
+                <>
+                  <Link href="/admin" onClick={() => setMenuOpen(false)} className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                    📊 Dashboard Admin
+                  </Link>
+                  <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="btn" style={{ width: "100%", justifyContent: "center", background: "var(--surface-2)", color: "var(--error)" }}>
+                    🚪 Keluar
+                  </button>
+                </>
+              ) : (
+                <Link href="/login" onClick={() => setMenuOpen(false)} className="btn btn-outline" style={{ width: "100%", justifyContent: "center" }}>
+                  🔐 Login Admin
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </div>

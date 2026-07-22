@@ -82,7 +82,7 @@ export default function ServicesPage() {
               <p>Coba ubah filter pencarian Anda.</p>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.75rem" }}>
+            <div className="cars-grid">
               {cars.map((car) => (
                 <ServiceCarCard key={car.id} car={car} />
               ))}

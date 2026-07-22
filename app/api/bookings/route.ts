@@ -17,11 +17,26 @@ export async function GET(request: NextRequest) {
     
     const status = searchParams.get("status");
     const search = searchParams.get("search");
+    const date = searchParams.get("date");
 
     const where: any = {};
     
     if (status && status !== "ALL") {
       where.status = status;
+    }
+
+    if (date) {
+      const d = new Date(date);
+      if (!isNaN(d.getTime())) {
+        const startOfDay = new Date(d);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(d);
+        endOfDay.setHours(23, 59, 59, 999);
+        where.pickupDate = {
+          gte: startOfDay,
+          lte: endOfDay,
+        };
+      }
     }
     
     if (search) {

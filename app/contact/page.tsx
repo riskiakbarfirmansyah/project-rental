@@ -63,7 +63,7 @@ export default async function ContactPage() {
         <div className="container" style={{ maxWidth: 860 }}>
 
           {/* Grid info kontak */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", marginBottom: "2.5rem" }}>
+          <div className="grid-2-col" style={{ marginBottom: "2.5rem" }}>
             {contacts.map((c) => (
               <a
                 key={c.label}

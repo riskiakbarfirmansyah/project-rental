@@ -65,7 +65,7 @@ export default async function HomePage() {
 
           {cars.length > 0 ? (
             <ScrollReveal direction="up" delay={150}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.75rem" }}>
+              <div className="cars-grid">
                 {cars.map((car) => (
                   <CarCard key={car.id} car={car} />
                 ))}

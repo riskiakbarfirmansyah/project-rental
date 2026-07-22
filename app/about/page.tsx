@@ -60,7 +60,7 @@ export default async function AboutPage() {
           </div>
 
           {/* Visi & Misi Cards — side by side */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", alignItems: "stretch" }}>
+          <div className="grid-2-col" style={{ alignItems: "stretch" }}>
 
             {/* Visi Card */}
             <div style={{
@@ -123,7 +123,7 @@ export default async function AboutPage() {
           </div>
 
           {/* Value Cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginTop: "2.5rem" }}>
+          <div className="grid-4-col" style={{ marginTop: "2.5rem" }}>
             {[
               { icon: "🛡️", title: config.about_val1_title || "Keamanan", desc: config.about_val1_desc || "Armada berstandar keamanan tinggi" },
               { icon: "⭐", title: config.about_val2_title || "Kualitas", desc: config.about_val2_desc || "Perawatan rutin setiap bulan" },
@@ -153,7 +153,7 @@ export default async function AboutPage() {
             <p className="section-subtitle">Kami menyediakan berbagai pilihan sewa mobil fleksibel untuk memenuhi segala kebutuhan perjalanan Anda.</p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem" }}>
+          <div className="grid-3-col">
             {[
               {
                 title: config.about_srv1_title || "Pilihan Waktu Sewa",
@@ -221,7 +221,7 @@ export default async function AboutPage() {
             <p className="section-subtitle">Kami memberikan garansi layanan terbaik di setiap perjalanan untuk kenyamanan ekstra Anda.</p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem" }}>
+          <div className="grid-3-col">
             {[
               {
                 title: config.about_grt1_title || "Perawatan Bengkel Resmi",

@@ -11,7 +11,7 @@ const features = [
 
 export default function WhyUsFeatures() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem" }}>
+    <div className="why-us-grid">
       {features.map((f) => (
         <div
           key={f.title}

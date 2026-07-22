@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -13,6 +13,219 @@ interface Car {
 interface AdminContact {
   label: string;
   wa: string;
+}
+
+const BULAN_INDONESIA = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+];
+
+const HARI_INDONESIA = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+
+function formatTanggalIndo(dateStr: string): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  return `${d.getDate()}/${BULAN_INDONESIA[d.getMonth()]}/${d.getFullYear()}`;
+}
+
+function formatTanggalIndoLengkap(dateStr: string): string {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "-";
+  const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  return `${hari[d.getDay()]}, ${d.getDate()} ${BULAN_INDONESIA[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* ─── Custom Date Picker ─── */
+function DatePickerIndo({
+  value,
+  onChange,
+  minDate,
+  id,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  minDate: string;
+  id: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const today = new Date();
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const min = minDate ? new Date(minDate) : null;
+  if (min) { min.setHours(0, 0, 0, 0); }
+
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
+    else setViewMonth(viewMonth - 1);
+  };
+
+  const nextMonth = () => {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
+    else setViewMonth(viewMonth + 1);
+  };
+
+  const canGoPrev = (() => {
+    if (!min) return true;
+    const prevLast = new Date(viewYear, viewMonth, 0);
+    return prevLast >= min;
+  })();
+
+  const selectDay = (day: number) => {
+    const selected = new Date(viewYear, viewMonth, day);
+    selected.setHours(12, 0, 0, 0);
+    const yyyy = selected.getFullYear();
+    const mm = String(selected.getMonth() + 1).padStart(2, "0");
+    const dd = String(selected.getDate()).padStart(2, "0");
+    onChange(`${yyyy}-${mm}-${dd}`);
+    setOpen(false);
+  };
+
+  const selectedDate = value ? new Date(value) : null;
+
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        type="button"
+        id={id}
+        onClick={() => setOpen(!open)}
+        className="form-control datepicker-trigger"
+        style={{
+          textAlign: "left", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          color: value ? "var(--text-primary)" : "var(--text-muted)",
+          background: "var(--surface)",
+        }}
+      >
+        <span>{value ? formatTanggalIndo(value) : "Pilih tanggal..."}</span>
+        <span style={{ fontSize: "1.1rem", opacity: 0.5 }}>📅</span>
+      </button>
+
+      {open && (
+        <div className="datepicker-dropdown" style={{
+          position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0,
+          zIndex: 100, background: "var(--surface)",
+          border: "1px solid var(--border)", borderRadius: "16px",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
+          padding: "1rem", minWidth: 280,
+          animation: "datePickerIn 0.2s ease",
+        }}>
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+            <button type="button" onClick={prevMonth} disabled={!canGoPrev}
+              style={{
+                width: 32, height: 32, borderRadius: "50%",
+                border: "1px solid var(--border)", background: "var(--surface-2)",
+                cursor: canGoPrev ? "pointer" : "not-allowed",
+                opacity: canGoPrev ? 1 : 0.3, display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.875rem", color: "var(--text-primary)", transition: "var(--transition)"
+              }}>◀</button>
+            <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: "var(--text-primary)" }}>
+              {BULAN_INDONESIA[viewMonth]} {viewYear}
+            </span>
+            <button type="button" onClick={nextMonth}
+              style={{
+                width: 32, height: 32, borderRadius: "50%",
+                border: "1px solid var(--border)", background: "var(--surface-2)",
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.875rem", color: "var(--text-primary)", transition: "var(--transition)"
+              }}>▶</button>
+          </div>
+
+          {/* Day headers */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "4px" }}>
+            {HARI_INDONESIA.map((h) => (
+              <div key={h} style={{ textAlign: "center", fontSize: "0.7rem", fontWeight: 700, color: "var(--text-muted)", padding: "4px 0", textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</div>
+            ))}
+          </div>
+
+          {/* Days grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
+            {cells.map((day, i) => {
+              if (day === null) return <div key={`e-${i}`} />;
+              const thisDate = new Date(viewYear, viewMonth, day);
+              thisDate.setHours(0, 0, 0, 0);
+              const disabled = min ? thisDate < min : false;
+              const isSelected = selectedDate &&
+                selectedDate.getDate() === day &&
+                selectedDate.getMonth() === viewMonth &&
+                selectedDate.getFullYear() === viewYear;
+              const isToday =
+                today.getDate() === day &&
+                today.getMonth() === viewMonth &&
+                today.getFullYear() === viewYear;
+
+              return (
+                <button
+                  type="button"
+                  key={day}
+                  disabled={disabled}
+                  onClick={() => selectDay(day)}
+                  style={{
+                    width: "100%", aspectRatio: "1", borderRadius: "10px",
+                    border: isToday && !isSelected ? "2px solid var(--primary)" : "2px solid transparent",
+                    background: isSelected
+                      ? "var(--primary)"
+                      : "transparent",
+                    color: isSelected
+                      ? "white"
+                      : disabled
+                        ? "var(--text-muted)"
+                        : "var(--text-primary)",
+                    fontWeight: isSelected || isToday ? 700 : 500,
+                    fontSize: "0.8125rem",
+                    cursor: disabled ? "not-allowed" : "pointer",
+                    opacity: disabled ? 0.35 : 1,
+                    transition: "all 0.15s ease",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  {day}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Quick action */}
+          <div style={{ marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <button type="button" onClick={() => {
+              const t = new Date();
+              selectDay(t.getDate());
+              setViewMonth(t.getMonth());
+              setViewYear(t.getFullYear());
+            }}
+              style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--primary)", background: "none", border: "none", cursor: "pointer", padding: "4px 8px" }}>
+              Hari ini
+            </button>
+            <button type="button" onClick={() => setOpen(false)}
+              style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: "4px 8px" }}>
+              Tutup
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 const copyToClipboard = (text: string): Promise<void> => {
@@ -98,12 +311,12 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
     ? (() => {
         const d = new Date(form.pickupDate);
         d.setDate(d.getDate() + duration);
-        return d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+        return `${d.getDate()} ${BULAN_INDONESIA[d.getMonth()]} ${d.getFullYear()}`;
       })()
     : "-";
 
   const pickupDateFormatted = form.pickupDate
-    ? new Date(form.pickupDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+    ? formatTanggalIndoLengkap(form.pickupDate)
     : "-";
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,30 +351,38 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
       }
 
       const bookingId = data.data.booking.id;
+      const pickupDateShort = form.pickupDate
+        ? formatTanggalIndo(form.pickupDate)
+        : "-";
 
       const msg = [
-        `🚗 *PEMESANAN SEWA MOBIL*`,
-        `━━━━━━━━━━━━━━━━━━━━`,
-        `*ID Booking:* ${bookingId}`,
+        `Halo Admin Bella Belly Trans Co 👋`,
+        `Saya ingin pesan sewa mobil dengan rincian berikut:`,
         ``,
-        `*Kendaraan:* ${car.brand} ${car.name} (${car.year})`,
-        `*Tipe:* ${car.type}`,
+        `📋 *ID BOOKING:* #${bookingId}`,
+        `──────────────────────────`,
         ``,
-        `*Detail Pemesan:*`,
-        `👤 Nama: ${form.customerName}`,
-        `📱 WhatsApp: ${form.customerWa}`,
+        `👤 *DATA PEMESAN*`,
+        `• Nama Lengkap: *${form.customerName}*`,
+        `• No. WhatsApp: *${form.customerWa}*`,
         ``,
-        `*Detail Sewa:*`,
-        `📅 Tanggal Ambil: ${pickupDateFormatted}`,
-        `⏱ Durasi: ${duration} hari`,
-        `🏁 Estimasi Selesai: ${endDate}`,
-        `📍 Lokasi Penjemputan: ${form.pickupLocation}`,
-        `🔑 Pilihan: ${form.driverOption === "lepas_kunci" ? "Lepas Kunci (tanpa supir)" : "Dengan Supir"}`,
+        `🚗 *ARMADA MOBIL*`,
+        `• Kendaraan: *${car.brand} ${car.name} (${car.year})*`,
+        `• Tipe/Transmisi: ${car.type} · ${car.transmission === "AUTOMATIC" ? "Matic" : "Manual"}`,
+        `• Layanan: *${form.driverOption === "lepas_kunci" ? "🗝️ Lepas Kunci (Tanpa Supir)" : "👨‍✈️ Dengan Supir"}*`,
         ``,
-        `💰 *Estimasi Biaya:* Rp ${totalPrice.toLocaleString("id-ID")}`,
-        `(Rp ${car.pricePerDay.toLocaleString("id-ID")}/hari × ${duration} hari)`,
+        `📅 *JADWAL & LOKASI*`,
+        `• Tanggal Ambil: *${pickupDateShort}* (${pickupDateFormatted})`,
+        `• Durasi Sewa: *${duration} Hari*`,
+        `• Estimasi Selesai: *${endDate}*`,
+        `• Penjemputan: *${form.pickupLocation}*`,
         ``,
-        `Mohon konfirmasi ketersediaan. Terima kasih! 🙏`,
+        `💰 *ESTIMASI BIAYA*`,
+        `• Tarif Harian: Rp ${car.pricePerDay.toLocaleString("id-ID")}/hari`,
+        `• Total Biaya: *Rp ${totalPrice.toLocaleString("id-ID")}*`,
+        ``,
+        `──────────────────────────`,
+        `Mohon konfirmasi ketersediaan unit & langkah selanjutnya ya. Terima kasih! 🙏`,
       ].join("\n");
 
       const waUrl = `https://wa.me/${adminWa}?text=${encodeURIComponent(msg)}`;
@@ -217,10 +438,10 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
 
       <section className="section" style={{ background: "var(--bg)" }}>
         <div className="container">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: "2.5rem", alignItems: "start" }}>
+          <div className="booking-grid">
 
             {/* ── KIRI: Info Mobil ── */}
-            <div style={{ position: "sticky", top: 90 }}>
+            <div className="booking-sidebar">
 
               {/* Car image */}
               <div style={{
@@ -299,7 +520,8 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                 <div style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "1rem 1.25rem", background: "var(--primary-light)",
-                  borderRadius: "var(--radius-lg)", border: "1px solid rgba(26,86,219,0.15)"
+                  borderRadius: "var(--radius-lg)", border: "1px solid rgba(26,86,219,0.15)",
+                  flexWrap: "wrap", gap: "0.5rem"
                 }}>
                   <span style={{ fontWeight: 600, color: "var(--primary-dark)", fontSize: "0.9375rem" }}>Harga Sewa</span>
                   <span style={{ fontFamily: "Sora, sans-serif", fontWeight: 800, fontSize: "1.375rem", color: "var(--primary)" }}>
@@ -313,7 +535,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   <label className="form-label">
                     📞 Pilih Admin <span style={{ color: "var(--error)" }}>*</span>
                   </label>
-                  <div style={{ display: "grid", gridTemplateColumns: `repeat(${admins.length}, 1fr)`, gap: "0.75rem" }}>
+                  <div className="booking-admin-grid">
                     {admins.map((a, idx) => (
                       <label key={a.label} htmlFor={`radio-admin-${idx}`}
                         style={{
@@ -371,17 +593,16 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                 </div>
 
                 {/* Tanggal ambil & Durasi */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div className="booking-date-duration-grid">
                   <div className="form-group">
                     <label className="form-label" htmlFor="booking-date">
                       📅 Tanggal Ambil <span style={{ color: "var(--error)" }}>*</span>
                     </label>
-                    <input
-                      id="booking-date" type="date" className="form-control"
-                      min={today}
+                    <DatePickerIndo
+                      id="booking-date"
                       value={form.pickupDate}
-                      onChange={(e) => setForm({ ...form, pickupDate: e.target.value })}
-                      required
+                      onChange={(val) => setForm({ ...form, pickupDate: val })}
+                      minDate={today}
                     />
                   </div>
                   <div className="form-group">
@@ -405,7 +626,8 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   <div style={{
                     padding: "0.75rem 1rem", background: "var(--surface-2)",
                     borderRadius: "var(--radius-md)", fontSize: "0.875rem",
-                    color: "var(--text-secondary)", display: "flex", gap: "0.5rem", alignItems: "center"
+                    color: "var(--text-secondary)", display: "flex", gap: "0.5rem", alignItems: "center",
+                    flexWrap: "wrap"
                   }}>
                     <span>🏁</span>
                     <span>Estimasi selesai: <strong style={{ color: "var(--text-primary)" }}>{endDate}</strong></span>
@@ -431,7 +653,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                   <label className="form-label">
                     🔑 Pilihan Sewa <span style={{ color: "var(--error)" }}>*</span>
                   </label>
-                  <div style={{ display: "grid", gridTemplateColumns: car.withDriverOnly ? "1fr" : "1fr 1fr", gap: "0.75rem" }}>
+                  <div className="booking-driver-grid" style={{ gridTemplateColumns: car.withDriverOnly ? "1fr" : undefined }}>
                     {[
                       {
                         value: "lepas_kunci",
@@ -491,11 +713,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                 )}
 
                 {/* Total Estimasi */}
-                <div style={{
-                  padding: "1.25rem", borderRadius: "var(--radius-lg)",
-                  background: "linear-gradient(135deg, #0f172a, #1e3a8a)",
-                  display: "flex", justifyContent: "space-between", alignItems: "center"
-                }}>
+                <div className="booking-total-box">
                   <div>
                     <div style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.8rem", marginBottom: "0.25rem" }}>
                       Rp {car.pricePerDay.toLocaleString("id-ID")} × {duration} hari
@@ -690,6 +908,106 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
           </div>
         </div>
       )}
+
+      {/* Responsive & DatePicker Styles */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes datePickerIn {
+          from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .datepicker-trigger {
+          min-height: 44px;
+        }
+
+        .booking-grid {
+          display: grid;
+          grid-template-columns: 1fr 1.5fr;
+          gap: 2.5rem;
+          align-items: start;
+        }
+
+        .booking-sidebar {
+          position: sticky;
+          top: 90px;
+        }
+
+        .booking-admin-grid {
+          display: grid;
+          grid-template-columns: repeat(${admins.length}, 1fr);
+          gap: 0.75rem;
+        }
+
+        .booking-date-duration-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
+        .booking-driver-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.75rem;
+        }
+
+        .booking-total-box {
+          padding: 1.25rem;
+          border-radius: var(--radius-lg);
+          background: linear-gradient(135deg, #0f172a, #1e3a8a);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+        }
+
+        /* ─── Mobile Responsive ─── */
+        @media (max-width: 900px) {
+          .booking-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1.5rem;
+          }
+          .booking-sidebar {
+            position: static !important;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .booking-grid {
+            gap: 1.25rem;
+          }
+          .booking-admin-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .booking-date-duration-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .booking-driver-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .booking-total-box {
+            flex-direction: column;
+            text-align: center;
+          }
+          .datepicker-dropdown {
+            position: fixed !important;
+            top: auto !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            border-radius: 20px 20px 0 0 !important;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1.25rem !important;
+            animation: datePickerSlideUp 0.3s ease !important;
+          }
+        }
+
+        @keyframes datePickerSlideUp {
+          from { opacity: 0; transform: translateY(100%); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}} />
 
       <Footer />
     </>

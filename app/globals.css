@@ -1244,24 +1244,219 @@ tr:hover td {
 .alert-warning { background: var(--warning-light); color: #92400e; }
 .alert-info { background: var(--info-light); color: #1e40af; }
 
+/* ===================== RESPONSIVE UTILITY GRIDS ===================== */
+.cars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+
+.why-us-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.grid-2-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.grid-3-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.grid-4-col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 1024px) {
-  .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .cars-grid,
+  .why-us-grid,
+  .grid-3-col {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .grid-4-col {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
   .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-  .admin-sidebar { width: 220px; }
-  .admin-content { margin-left: 220px; }
+  .admin-content { margin-left: 220px; padding: 2rem; }
+  .hero-v2-layout { gap: 2rem; }
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+  
+  .cars-grid,
+  .why-us-grid,
+  .grid-2-col,
+  .grid-3-col,
+  .grid-4-col,
   .grid-cols-2,
   .grid-cols-3,
-  .grid-cols-4 { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr; }
-  .section { padding: 3rem 0; }
-  .navbar-links { display: none; }
-  .hero { min-height: 75vh; }
-  .admin-sidebar { display: none; }
-  .admin-content { margin-left: 0; }
+  .grid-cols-4 { 
+    grid-template-columns: 1fr !important; 
+    gap: 1.25rem !important;
+  }
+  
+  .footer-grid { 
+    grid-template-columns: 1fr !important; 
+    gap: 2rem;
+  }
+  
+  .section { 
+    padding: 2.5rem 0 !important; 
+  }
+
+  /* Navbar Mobile */
+  .navbar-links { 
+    display: none !important; 
+  }
+
+  .navbar-desktop-actions {
+    display: none !important;
+  }
+
+  .mobile-menu-btn { 
+    display: flex !important; 
+  }
+
+  .navbar-inner {
+    padding: 0.75rem 0;
+  }
+
+  /* Hero Section Mobile */
+  .hero-v2 {
+    min-height: auto !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  .hero-v2-layout {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+    padding: 1.5rem 0 !important;
+    min-height: auto !important;
+  }
+
+  .hero-v2-title {
+    font-size: 1.875rem !important;
+    line-height: 1.25 !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .hero-v2-subtitle {
+    font-size: 0.9375rem !important;
+    line-height: 1.6 !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .hero-social-proof {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Hero Quick Stats Grid on Mobile */
+  .hero-quick-stats {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.875rem !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 1rem !important;
+  }
+
+  .hero-quick-stat {
+    padding: 0 !important;
+    text-align: left !important;
+  }
+
+  .hero-quick-stat-num {
+    font-size: 1.1rem !important;
+  }
+
+  .hero-quick-stat-label {
+    font-size: 0.7rem !important;
+  }
+
+  .hero-quick-stat-sep {
+    display: none !important;
+  }
+
+  /* Hero Visual & Floating Cards on Mobile */
+  .hero-v2-visual {
+    margin-top: 0.5rem;
+  }
+
+  .hero-car-showcase {
+    max-width: 280px !important;
+    aspect-ratio: auto !important;
+    margin: 0 auto;
+  }
+
+  .hero-car-showcase img {
+    width: 100% !important;
+    max-width: 280px !important;
+  }
+
+  /* Hide floating cards on mobile to prevent overflow/overlap */
+  .hero-float-card {
+    display: none !important;
+  }
+
+  /* Headings & Typography */
+  h1 {
+    font-size: 1.875rem !important;
+    line-height: 1.25 !important;
+  }
+
+  h2 {
+    font-size: 1.375rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Admin Responsive */
+  .admin-content { 
+    margin-left: 0 !important; 
+    padding: 5rem 1rem 2rem 1rem !important;
+    width: 100% !important;
+  }
+
+  /* Tables container */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Forms & Buttons on Mobile */
+  .btn-lg {
+    padding: 0.875rem 1.5rem !important;
+    font-size: 0.9375rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  h1 {
+    font-size: 1.625rem !important;
+  }
+
+  .hero-quick-stats {
+    grid-template-columns: 1fr 1fr !important;
+  }
 }
 
 /* ===================== MODERN DASHBOARD CARDS ===================== */
@@ -1274,3 +1469,6 @@ tr:hover td {
 .table-container table tbody tr:hover td {
   background-color: var(--surface-2);
 }
+
+
+
