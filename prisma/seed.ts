@@ -1,19 +1,6 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { prisma } from "../lib/prisma";
 import bcrypt from "bcryptjs";
-
-function parseDbUrl(url: string) {
-  try {
-    const u = new URL(url);
-    return { host: u.hostname, port: u.port ? parseInt(u.port) : 3306, user: u.username || "root", password: u.password || "", database: u.pathname.slice(1) };
-  } catch {
-    return { host: "localhost", port: 3306, user: "root", password: "", database: "rental_db" };
-  }
-}
-
-const adapter = new PrismaMariaDb(parseDbUrl(process.env.DATABASE_URL || "mysql://root:@localhost:3306/rental_db"));
-const prisma = new PrismaClient({ adapter });
 
 
 async function main() {

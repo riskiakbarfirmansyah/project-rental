@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 enum Role {
@@ -112,7 +112,7 @@ model BlogPost {
   id              String    @id @default(cuid())
   title           String
   slug            String    @unique
-  content         String    @db.LongText
+  content         String    @db.Text
   excerpt         String    @db.Text
   imageUrl        String?
   category        String?
