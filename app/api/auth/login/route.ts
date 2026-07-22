@@ -18,12 +18,12 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return errorResponse("Email atau password salah", 401);
+      return errorResponse("Email tidak terdaftar. Silakan periksa kembali atau hubungi administrator.", 401);
     }
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      return errorResponse("Email atau password salah", 401);
+      return errorResponse("Password salah. Silakan coba lagi.", 401);
     }
 
     const token = await signJwt({ userId: user.id, email: user.email, role: user.role });

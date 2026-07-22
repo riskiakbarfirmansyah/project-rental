@@ -107,12 +107,12 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <div>
-            <p>© {year} Bella Belly Trans Co. All rights reserved.</p>
+            <p>© {year} Kayta Co. All rights reserved.</p>
           </div>
-          <div className="footer-bottom-links">
+          {/* <div className="footer-bottom-links">
             <Link href="/privacy">Kebijakan Privasi</Link>
             <Link href="/terms">Syarat & Ketentuan</Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>
