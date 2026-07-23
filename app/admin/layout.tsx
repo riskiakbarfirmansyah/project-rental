@@ -21,6 +21,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  // Auth guard — redirect to /login if not admin
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.data.user.role === "ADMIN") {
+          setIsAuthorized(true);
+        } else {
+          router.replace("/login");
+        }
+      })
+      .catch(() => {
+        router.replace("/login");
+      })
+      .finally(() => setAuthChecked(true));
+  }, [router]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -43,6 +62,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const sidebarWidth = 260;
+
+  // Show loading while checking auth
+  if (!authChecked || !isAuthorized) {
+    return (
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        minHeight: "100vh", background: "var(--bg)",
+        flexDirection: "column", gap: "1rem",
+      }}>
+        <div style={{
+          width: 40, height: 40, border: "3px solid var(--border)",
+          borderTopColor: "var(--primary)", borderRadius: "50%",
+          animation: "spin 0.8s linear infinite",
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-layout" style={{ position: "relative", minHeight: "100vh" }}>

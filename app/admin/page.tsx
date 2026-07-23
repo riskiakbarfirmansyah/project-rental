@@ -175,7 +175,7 @@ export default function AdminDashboard() {
           {
             label: "Traffic Pengunjung",
             value: stats?.totalPageViews?.toLocaleString("id-ID") || "0",
-            sub: `${stats?.uniqueVisitorsToday || 0} pengunjung unik hari ini`,
+            sub: `Pengunjung hari ini`,
             icon: (
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />

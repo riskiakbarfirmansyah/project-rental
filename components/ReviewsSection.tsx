@@ -129,15 +129,26 @@ export default function ReviewsSection({ reviews, mapsEmbedUrl }: ReviewsSection
         {mapsEmbedUrl && (
           <div style={{
             borderRadius: "var(--radius-xl)", overflow: "hidden",
-            border: "1px solid var(--border)", height: 400,
+            border: "1px solid var(--border)",
             boxShadow: "var(--shadow-md)",
-            marginTop: "3rem"
+            marginTop: "3rem",
+            position: "relative",
+            width: "100%",
+            paddingBottom: "min(400px, 56.25%)",
+            minHeight: "250px",
           }}>
             <iframe
               src={mapsEmbedUrl}
               width="100%"
               height="100%"
-              style={{ border: 0, display: "block" }}
+              style={{
+                border: 0, display: "block",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
