@@ -80,7 +80,7 @@ export default function AdminDashboard() {
         paddingBottom: "1.5rem",
         borderBottom: "1px solid var(--border)"
       }}>
-        <h1 style={{ fontSize: "2rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
+        <h1 className="admin-page-title" style={{ fontSize: "2rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
           Ringkasan Bisnis
         </h1>
         <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", marginTop: "0.25rem" }}>
@@ -89,7 +89,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── STATS CARDS GRID (3 Columns) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem" }}>
+      <div className="admin-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem" }}>
         {[
           {
             label: "Total Armada Mobil",
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
                 <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   {s.label}
                 </span>
-                <div style={{ fontFamily: "Sora, sans-serif", fontSize: "1.875rem", fontWeight: 800, color: "var(--text-primary)", marginTop: "0.5rem" }}>
+                <div className="admin-stat-value" style={{ fontFamily: "Sora, sans-serif", fontSize: "1.875rem", fontWeight: 800, color: "var(--text-primary)", marginTop: "0.5rem" }}>
                   {s.value}
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── SPLIT GRID LAYOUT (Left: Bookings, Right: Status & Quick Actions) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1.2fr", gap: "2rem" }}>
+      <div className="admin-split-grid" style={{ display: "grid", gridTemplateColumns: "1.8fr 1.2fr", gap: "2rem" }}>
         
         {/* ── LEFT: RECENT BOOKINGS TABLE ── */}
         <div style={{

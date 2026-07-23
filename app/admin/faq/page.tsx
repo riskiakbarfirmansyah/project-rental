@@ -62,7 +62,7 @@ export default function AdminFaqPage() {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+      <div className="admin-header-bar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
         <div>
           <h1 style={{ fontSize: "1.75rem", marginBottom: "0.25rem" }}>Manajemen FAQ</h1>
           <p style={{ color: "var(--text-secondary)" }}>{faqs.length} pertanyaan</p>
@@ -74,7 +74,7 @@ export default function AdminFaqPage() {
         {loading ? (
           <div style={{ display: "flex", justifyContent: "center", padding: "3rem" }}><div className="spinner" /></div>
         ) : faqs.map((faq) => (
-          <div key={faq.id} id={`faq-admin-row-${faq.id}`} style={{ background: "var(--surface)", borderRadius: "var(--radius-lg)", padding: "1.5rem", border: "1px solid var(--border)", display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
+          <div key={faq.id} id={`faq-admin-row-${faq.id}`} className="admin-faq-card" style={{ background: "var(--surface)", borderRadius: "var(--radius-lg)", padding: "1.5rem", border: "1px solid var(--border)", display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
             <div style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--primary-light)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, flexShrink: 0, fontSize: "0.875rem" }}>
               {faq.order}
             </div>
@@ -82,7 +82,7 @@ export default function AdminFaqPage() {
               <div style={{ fontWeight: 700, marginBottom: "0.5rem" }}>{faq.question}</div>
               <div style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", lineHeight: 1.6 }}>{faq.answer}</div>
             </div>
-            <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
+            <div className="admin-faq-actions" style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
               <span className={`badge ${faq.isActive ? "badge-success" : "badge-error"}`}>{faq.isActive ? "Aktif" : "Nonaktif"}</span>
               <button className="btn btn-sm btn-outline" onClick={() => openEdit(faq)} id={`edit-faq-${faq.id}`}>Edit</button>
               <button className="btn btn-sm btn-danger" onClick={() => handleDelete(faq.id)} id={`delete-faq-${faq.id}`}>Hapus</button>

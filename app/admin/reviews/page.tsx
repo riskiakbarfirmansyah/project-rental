@@ -101,7 +101,7 @@ export default function AdminReviewsPage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+      <div className="admin-header-bar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
         <div>
           <h1 style={{ fontSize: "1.75rem", marginBottom: "0.25rem" }}>Manajemen Review</h1>
           <p style={{ color: "var(--text-secondary)" }}>{reviews.length} review · Ditampilkan di halaman utama & tentang kami</p>
@@ -131,7 +131,7 @@ export default function AdminReviewsPage() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {reviews.map((r) => (
-            <div key={r.id} id={`review-card-${r.id}`} style={{
+            <div key={r.id} id={`review-card-${r.id}`} className="admin-review-card" style={{
               background: "var(--surface)", border: "1px solid var(--border)",
               borderRadius: "var(--radius-xl)", padding: "1.25rem",
               display: "flex", gap: "1.25rem", alignItems: "flex-start",
@@ -160,7 +160,7 @@ export default function AdminReviewsPage() {
               </div>
 
               {/* Actions */}
-              <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
+              <div className="admin-review-actions" style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
                 <button
                   onClick={() => toggleVisible(r)}
                   className={`badge ${r.isVisible ? "badge-success" : "badge-error"}`}
