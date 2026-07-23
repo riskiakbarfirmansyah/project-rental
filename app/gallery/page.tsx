@@ -5,6 +5,9 @@ import GalleryLightbox from "@/app/gallery/Gallerylightbox";
 
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = { title: "Galeri" };
 
 export default async function GalleryPage() {
