@@ -2,21 +2,19 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+import { prisma } from "@/lib/prisma";
+
 export const metadata: Metadata = { title: "Kontak" };
 
 export default async function ContactPage() {
   // Ambil config untuk kontak yang bisa diubah admin
   let config: Record<string, string> = {};
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/config`,
-      { cache: "no-store" }
-    );
-    if (res.ok) {
-      const d = await res.json();
-      config = d.data?.config || {};
-    }
-  } catch {}
+    const configsData = await prisma.siteConfig.findMany();
+    config = configsData.reduce((acc, c) => ({ ...acc, [c.key]: c.value }), {} as Record<string, string>);
+  } catch (error) {
+    console.error("ContactPage DB fetch error:", error);
+  }
 
   const phone    = config.contact_phone    || "+62 813-2548-5262";
   const address  = config.contact_address  || "Jl. Sawunggaling Selatan No 48 Semarang";

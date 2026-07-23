@@ -8,6 +8,7 @@ async function main() {
 
   // Hapus data lama
   await prisma.contactMessage.deleteMany();
+  await prisma.review.deleteMany();
   await prisma.galleryItem.deleteMany();
   await prisma.faqItem.deleteMany();
   await prisma.blogPost.deleteMany();
@@ -305,7 +306,46 @@ async function main() {
       })
     )
   );
-  console.log(`✅ ${galleryItems.length} item galeri dibuat`);
+  // Reviews
+  const reviews = await Promise.all([
+    prisma.review.create({
+      data: {
+        reviewerName: "Rizky Pratama",
+        reviewerAvatar: "R",
+        rating: 5,
+        content: "Pelayanan sangat memuaskan, mobil bersih dan harum. Driver ramah dan paham rute Semarang dengan baik. Sangat direkomendasikan!",
+        source: "Google Review",
+        reviewDate: "1 minggu lalu",
+        isVisible: true,
+        order: 1,
+      },
+    }),
+    prisma.review.create({
+      data: {
+        reviewerName: "Dewi Anggraini",
+        reviewerAvatar: "D",
+        rating: 5,
+        content: "Proses booking cepat dan tidak ribet. Unit Avanza 2025 yang kami sewa dalam kondisi prima seperti baru. Pasti akan sewa di sini lagi.",
+        source: "Google Review",
+        reviewDate: "2 minggu lalu",
+        isVisible: true,
+        order: 2,
+      },
+    }),
+    prisma.review.create({
+      data: {
+        reviewerName: "Budi Santoso",
+        reviewerAvatar: "B",
+        rating: 5,
+        content: "Harga terjangkau dengan fasilitas all in yang sangat membantu perjalanan dinas kami di Semarang. Sukses terus Bella Belly Trans Co!",
+        source: "Google Review",
+        reviewDate: "1 bulan lalu",
+        isVisible: true,
+        order: 3,
+      },
+    }),
+  ]);
+  console.log(`✅ ${reviews.length} review dibuat`);
 
   console.log("\n🎉 Seeding selesai!");
   console.log("📧 Admin login: admin@rentalku.com / admin123");

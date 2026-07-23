@@ -2,14 +2,18 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+import { prisma } from "@/lib/prisma";
+
 export const metadata: Metadata = { title: "Tentang Kami" };
 
 export default async function AboutPage() {
   let config: Record<string, string> = {};
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/config`, { cache: "no-store" });
-    if (res.ok) { const d = await res.json(); config = d.data?.config || {}; }
-  } catch {}
+    const configsData = await prisma.siteConfig.findMany();
+    config = configsData.reduce((acc, c) => ({ ...acc, [c.key]: c.value }), {} as Record<string, string>);
+  } catch (error) {
+    console.error("AboutPage DB fetch error:", error);
+  }
 
 
   const missionPoints = (

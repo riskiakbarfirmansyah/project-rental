@@ -7,9 +7,10 @@ import { NextRequest, NextResponse } from "next/server";
  * Dipanggil oleh Vercel Cron sesuai konfigurasi di vercel.json.
  */
 export async function GET(request: NextRequest) {
-  // Verifikasi cron secret agar tidak bisa dipanggil sembarangan
+  // Verifikasi cron secret atau header otomatis Vercel Cron
   const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const isVercelCron = request.headers.get("x-vercel-cron") === "1";
+  if (process.env.CRON_SECRET && !isVercelCron && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

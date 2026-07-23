@@ -6,37 +6,94 @@ import HeroSection from "@/components/HeroSection";
 import ReviewsSection from "@/components/ReviewsSection";
 import ScrollReveal from "@/components/ScrollReveal";
 
+import { prisma } from "@/lib/prisma";
+
 export const metadata: Metadata = {
   title: "Bella Belly Trans Co",
 };
 
+const DEFAULT_MAPS_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3959.4643530059825!2d110.43101067365318!3d-7.072036992930665!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e708f0077870a03%3A0xc7f930af53eb3867!2sBella%20Belly%20Trans%20Co!5e0!3m2!1sen!2sid!4v1783429219539!5m2!1sen!2sid";
+
+const DEFAULT_REVIEWS = [
+  {
+    id: "default-1",
+    reviewerName: "Rizky Pratama",
+    reviewerAvatar: "R",
+    rating: 5,
+    content: "Pelayanan sangat memuaskan, mobil bersih dan harum. Driver ramah dan paham rute Semarang dengan baik. Sangat direkomendasikan!",
+    source: "Google Review",
+    reviewDate: "1 minggu lalu",
+    isVisible: true,
+  },
+  {
+    id: "default-2",
+    reviewerName: "Dewi Anggraini",
+    reviewerAvatar: "D",
+    rating: 5,
+    content: "Proses booking cepat dan tidak ribet. Unit Avanza 2025 yang kami sewa dalam kondisi prima seperti baru. Pasti akan sewa di sini lagi.",
+    source: "Google Review",
+    reviewDate: "2 minggu lalu",
+    isVisible: true,
+  },
+  {
+    id: "default-3",
+    reviewerName: "Budi Santoso",
+    reviewerAvatar: "B",
+    rating: 5,
+    content: "Harga terjangkau dengan fasilitas all in yang sangat membantu perjalanan dinas kami di Semarang. Sukses terus Bella Belly Trans Co!",
+    source: "Google Review",
+    reviewDate: "1 bulan lalu",
+    isVisible: true,
+  },
+];
+
 export default async function HomePage() {
-  // Ambil data server-side
   let cars: {id: string; name: string; brand: string; type: string; pricePerDay: number; seats: number; transmission: string; imageUrl?: string}[] = [];
   let config: Record<string, string> = {};
   let reviews: {id: string; reviewerName: string; reviewerAvatar?: string; rating: number; content: string; source: string; reviewDate?: string}[] = [];
 
   try {
-    const [carsRes, configRes, reviewsRes] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/cars?limit=6&available=true`, { cache: "no-store" }),
-      fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/config`, { cache: "no-store" }),
-      fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/reviews`, { cache: "no-store" }),
+    const [carsData, configsData, reviewsData] = await Promise.all([
+      prisma.car.findMany({
+        where: { isAvailable: true },
+        take: 6,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.siteConfig.findMany(),
+      prisma.review.findMany({
+        where: { isVisible: true },
+        orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      }),
     ]);
-    if (carsRes.ok) {
-      const data = await carsRes.json();
-      cars = data.data?.cars || [];
-    }
-    if (configRes.ok) {
-      const data = await configRes.json();
-      config = data.data?.config || {};
-    }
-    if (reviewsRes.ok) {
-      const data = await reviewsRes.json();
-      reviews = (data.data?.reviews || []).filter((r: {isVisible: boolean}) => r.isVisible);
-    }
-  } catch {
-    // silently fail
+
+    cars = carsData.map((c) => ({
+      id: c.id,
+      name: c.name,
+      brand: c.brand,
+      type: c.type,
+      pricePerDay: Number(c.pricePerDay),
+      seats: c.seats,
+      transmission: c.transmission,
+      imageUrl: c.imageUrl || undefined,
+    }));
+
+    reviews = reviewsData.length > 0
+      ? reviewsData.map((r) => ({
+          id: r.id,
+          reviewerName: r.reviewerName,
+          reviewerAvatar: r.reviewerAvatar || undefined,
+          rating: r.rating,
+          content: r.content,
+          source: r.source,
+          reviewDate: r.reviewDate || undefined,
+        }))
+      : DEFAULT_REVIEWS;
+  } catch (error) {
+    console.error("HomePage DB fetch error:", error);
+    reviews = DEFAULT_REVIEWS;
   }
+
+  const mapsUrl = config.google_maps_embed || DEFAULT_MAPS_URL;
 
 
 
@@ -146,7 +203,7 @@ export default async function HomePage() {
       <ScrollReveal direction="up">
         <ReviewsSection
           reviews={reviews}
-          mapsEmbedUrl={config.google_maps_embed || undefined}
+          mapsEmbedUrl={mapsUrl}
         />
       </ScrollReveal>
 

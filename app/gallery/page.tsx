@@ -3,14 +3,29 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import GalleryLightbox from "@/app/gallery/Gallerylightbox";
 
+import { prisma } from "@/lib/prisma";
+
 export const metadata: Metadata = { title: "Galeri" };
 
 export default async function GalleryPage() {
   let items: { id: string; title: string; description?: string; imageUrl: string; car?: { name: string; brand: string } }[] = [];
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/gallery`, { cache: "no-store" });
-    if (res.ok) { const d = await res.json(); items = d.data?.items || []; }
-  } catch {}
+    const rawItems = await prisma.galleryItem.findMany({
+      include: {
+        car: { select: { name: true, brand: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    items = rawItems.map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description || undefined,
+      imageUrl: item.imageUrl,
+      car: item.car || undefined,
+    }));
+  } catch (error) {
+    console.error("GalleryPage DB fetch error:", error);
+  }
 
   return (
     <>

@@ -2,14 +2,20 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+import { prisma } from "@/lib/prisma";
+
 export const metadata: Metadata = { title: "FAQ" };
 
 export default async function FaqPage() {
   let faqs: { id: string; question: string; answer: string }[] = [];
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/faq`, { cache: "no-store" });
-    if (res.ok) { const d = await res.json(); faqs = d.data?.faqs || []; }
-  } catch {}
+    faqs = await prisma.faqItem.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    });
+  } catch (error) {
+    console.error("FaqPage DB fetch error:", error);
+  }
 
   return (
     <>

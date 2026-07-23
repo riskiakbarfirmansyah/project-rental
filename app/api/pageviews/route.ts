@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/auth";
 import { headers } from "next/headers";
 
 export async function POST(request: Request) {
@@ -94,5 +95,18 @@ export async function GET() {
   } catch (error) {
     console.error("PageView stats error:", error);
     return errorResponse("Gagal mengambil data traffic", 500);
+  }
+}
+
+export async function DELETE() {
+  try {
+    const auth = await requireAdmin();
+    if ("error" in auth) return errorResponse(auth.error, auth.status);
+
+    const deleted = await prisma.pageView.deleteMany();
+    return successResponse({ message: `Berhasil mereset data traffic (${deleted.count} record dihapus)` });
+  } catch (error) {
+    console.error("Reset pageviews error:", error);
+    return errorResponse("Gagal mereset data traffic", 500);
   }
 }
