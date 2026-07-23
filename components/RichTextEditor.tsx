@@ -237,7 +237,7 @@ export default function RichTextEditor({ content, onChange, placeholder = "Mulai
   // Be careful not to reset cursor position while typing
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content, false, { preserveWhitespace: "full" });
+      editor.commands.setContent(content);
     }
   }, [content, editor]);
 
