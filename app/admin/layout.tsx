@@ -81,6 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  //dumb saja buat deploy
   return (
     <div className="admin-layout" style={{ position: "relative", minHeight: "100vh" }}>
       
