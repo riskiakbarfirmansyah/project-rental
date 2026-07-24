@@ -92,17 +92,20 @@ export default function AdminGalleryPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-    if (!validTypes.includes(file.type)) {
-      setAddError("Format file tidak didukung. Gunakan JPG, PNG, atau WEBP.");
+    // Validate type & extension
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg", "image/gif", "image/pjpeg", "image/jfif", "image/heic"];
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    const validExts = ["jpg", "jpeg", "png", "webp", "gif", "jfif", "heic"];
+
+    if (file.type && !validTypes.includes(file.type.toLowerCase()) && !validExts.includes(ext)) {
+      setAddError("Format file tidak didukung. Gunakan JPG, PNG, WEBP, GIF, atau JFIF.");
       return;
     }
 
-    // Validate size (e.g., max 5MB)
-    const maxSize = 5 * 1024 * 1024;
+    // Validate size (max 10MB)
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      setAddError("Ukuran file terlalu besar (Maksimal 5MB).");
+      setAddError("Ukuran file terlalu besar (Maksimal 10MB).");
       return;
     }
 
