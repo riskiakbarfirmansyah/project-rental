@@ -43,13 +43,22 @@ export async function POST(request: NextRequest) {
 
     const cleanExt = ext.replace(/[^a-zA-Z0-9]/g, "") || "jpg";
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${cleanExt}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, filename), buffer);
+    try {
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+      await mkdir(uploadDir, { recursive: true });
+      await writeFile(path.join(uploadDir, filename), buffer);
 
-    const url = `/uploads/${filename}`;
-    return successResponse({ url }, 201);
+      const url = `/uploads/${filename}`;
+      return successResponse({ url }, 201);
+    } catch (fsError: any) {
+      if (fsError.code === "EROFS" || fsError.message?.includes("read-only") || process.env.VERCEL) {
+        const mime = fileType || `image/${cleanExt === "jpg" ? "jpeg" : cleanExt}`;
+        const base64Url = `data:${mime};base64,${buffer.toString("base64")}`;
+        return successResponse({ url: base64Url }, 201);
+      }
+      throw fsError;
+    }
   } catch (error: any) {
     console.error("Upload error:", error);
     return errorResponse(error?.message || "Terjadi kesalahan saat upload", 500);
