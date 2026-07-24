@@ -21,7 +21,27 @@ export async function POST(request: NextRequest) {
       return errorResponse("Email tidak terdaftar. Silakan periksa kembali atau hubungi administrator.", 401);
     }
 
-    const isValid = await bcrypt.compare(password, user.password);
+    let isValid = false;
+    try {
+      isValid = await bcrypt.compare(password, user.password);
+    } catch {
+      isValid = false;
+    }
+
+    // Fallback: Jika data user dimasukkan manual via Supabase Table Editor tanpa di-hash
+    if (!isValid && user.password === password) {
+      isValid = true;
+      try {
+        const hashedPassword = await bcrypt.hash(password, 12);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { password: hashedPassword },
+        });
+      } catch (err) {
+        console.error("Auto-hash password error:", err);
+      }
+    }
+
     if (!isValid) {
       return errorResponse("Password salah. Silakan coba lagi.", 401);
     }
