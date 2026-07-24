@@ -55,9 +55,9 @@ export const blogSchema = z.object({
 
 export const gallerySchema = z.object({
   title: z.string().min(2, "Judul minimal 2 karakter"),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   imageUrl: z.string().min(1, "Gambar wajib diisi"),
-  carId: z.string().optional(),
+  carId: z.string().optional().nullable(),
 });
 
 export const faqSchema = z.object({

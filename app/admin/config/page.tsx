@@ -64,15 +64,9 @@ const CONFIG_FIELDS = [
     { key: "facebook", label: "Facebook", type: "text" },
     { key: "google_maps_embed", label: "Google Maps Embed URL (src dari iframe)", type: "textarea" },
   ]},
-  { section: "Statistik (Tampilan Home)", fields: [
-    { key: "years_experience", label: "Tahun Pengalaman", type: "text" },
-    { key: "total_fleet", label: "Total Armada", type: "text" },
-    { key: "happy_customers", label: "Pelanggan Puas", type: "text" },
-    { key: "service_areas", label: "Kota Layanan", type: "text" },
-  ]},
 ];
 
-const SECTION_ICONS = ["🌐", "🚀", "🏢", "💎", "🚗", "🛡️", "📝", "📞", "📊"];
+const SECTION_ICONS = ["🌐", "🚀", "🏢", "💎", "🚗", "🛡️", "📝", "📞"];
 
 export default function AdminConfigPage() {
   const [config, setConfig] = useState<Record<string, string>>({});

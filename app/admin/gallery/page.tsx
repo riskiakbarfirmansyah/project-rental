@@ -142,18 +142,28 @@ export default function AdminGalleryPage() {
       const resUpload = await fetch("/api/upload", { method: "POST", body: fd });
       const dataUpload = await resUpload.json();
 
-      if (!dataUpload.success) throw new Error(dataUpload.error || "Gagal mengunggah foto");
+      if (!resUpload.ok || !dataUpload.success) {
+        throw new Error(dataUpload.error || "Gagal mengunggah foto");
+      }
 
       // 2. Save Item
+      const payload: Record<string, any> = {
+        title: addForm.title.trim(),
+        imageUrl: dataUpload.data.url,
+      };
+      if (addForm.description.trim()) {
+        payload.description = addForm.description.trim();
+      }
+
       const resGallery = await fetch("/api/gallery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...addForm, imageUrl: dataUpload.data.url }),
+        body: JSON.stringify(payload),
       });
 
-      if (!resGallery.ok) {
-        const errData = await resGallery.json();
-        throw new Error(errData.error || "Gagal menyimpan data galeri");
+      const dataGallery = await resGallery.json();
+      if (!resGallery.ok || !dataGallery.success) {
+        throw new Error(dataGallery.error || "Gagal menyimpan data galeri");
       }
 
       alert("Foto berhasil ditambahkan!");
@@ -171,11 +181,20 @@ export default function AdminGalleryPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setEditUploading(true);
-    const fd = new FormData(); fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    const data = await res.json();
-    if (data.success) setEditForm((f) => ({ ...f, imageUrl: data.data.url }));
-    setEditUploading(false);
+    try {
+      const fd = new FormData(); fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.success) {
+        setEditForm((f) => ({ ...f, imageUrl: data.data.url }));
+      } else {
+        alert(data.error || "Gagal mengunggah foto");
+      }
+    } catch (err: any) {
+      alert("Gagal mengunggah foto: " + (err.message || "Terjadi kesalahan sistem"));
+    } finally {
+      setEditUploading(false);
+    }
   };
 
   const openEdit = (item: GalleryItem) => {
@@ -187,14 +206,28 @@ export default function AdminGalleryPage() {
     e.preventDefault();
     if (!editItem) return;
     setEditSubmitting(true);
-    await fetch(`/api/gallery/${editItem.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editForm),
-    });
-    setEditItem(null);
-    load();
-    setEditSubmitting(false);
+    try {
+      const res = await fetch(`/api/gallery/${editItem.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: editForm.title.trim(),
+          description: editForm.description.trim() || undefined,
+          imageUrl: editForm.imageUrl,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        alert(data.error || "Gagal memperbarui galeri");
+      } else {
+        setEditItem(null);
+        load();
+      }
+    } catch (err: any) {
+      alert("Terjadi kesalahan: " + (err.message || "Gagal menyimpan"));
+    } finally {
+      setEditSubmitting(false);
+    }
   };
 
   const handleDelete = async (id: string) => {

@@ -26,7 +26,11 @@ export async function POST(request: NextRequest) {
     const parsed = gallerySchema.safeParse(body);
     if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
-    const item = await prisma.galleryItem.create({ data: parsed.data });
+    const data = { ...parsed.data };
+    if (!data.carId) delete data.carId;
+    if (data.description === "") data.description = undefined;
+
+    const item = await prisma.galleryItem.create({ data });
     return successResponse({ item }, 201);
   } catch (error) {
     console.error("Create gallery error:", error);

@@ -80,6 +80,8 @@ export default async function HomePage() {
       imageUrl: c.imageUrl || undefined,
     }));
 
+    config = configsData.reduce((acc, c) => ({ ...acc, [c.key]: c.value }), {} as Record<string, string>);
+
     reviews = reviewsData.length > 0
       ? reviewsData.map((r) => ({
           id: r.id,

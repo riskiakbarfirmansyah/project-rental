@@ -738,19 +738,35 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                     </div>
                     <div style={{ fontSize: "0.8125rem", color: "#0c4a6e", lineHeight: 1.6 }}>
                       {(() => {
-                        const promoParts = (config.booking_promo_desc || "Dapatkan harga spesial (lebih hemat dari estimasi) untuk kondisi berikut: * Penyewaan lebih dari 7 hari * Penyewa yang sedang berulang tahun * Klaim diskon ke admin via WhatsApp setelah pesanan dikirim!").split("*").map(s => s.trim()).filter(Boolean);
-                        return (
-                          <>
-                            {promoParts[0]}
-                            {promoParts.length > 1 && (
-                              <ul style={{ margin: "0.25rem 0 0.5rem 1.25rem", padding: 0 }}>
-                                {promoParts.slice(1).map((pt, i) => (
-                                  <li key={i} style={{ paddingLeft: "0.25rem", marginBottom: "0.125rem" }}>{pt}</li>
-                                ))}
-                              </ul>
-                            )}
-                          </>
-                        );
+                        const defaultDesc = "Dapatkan harga spesial (lebih hemat dari estimasi) untuk kondisi berikut: * Penyewaan lebih dari 7 hari * Penyewa yang sedang berulang tahun * Klaim diskon ke admin via WhatsApp setelah pesanan dikirim!";
+                        const rawText = (config.booking_promo_desc || defaultDesc).trim();
+                        const startsWithAsterisk = rawText.startsWith("*");
+                        const parts = rawText.split("*").map(s => s.trim()).filter(Boolean);
+
+                        if (startsWithAsterisk) {
+                          return (
+                            <ul style={{ margin: "0.25rem 0 0.5rem 1.25rem", padding: 0 }}>
+                              {parts.map((pt, i) => (
+                                <li key={i} style={{ paddingLeft: "0.25rem", marginBottom: "0.125rem" }}>{pt}</li>
+                              ))}
+                            </ul>
+                          );
+                        } else {
+                          const intro = parts[0];
+                          const listItems = parts.slice(1);
+                          return (
+                            <>
+                              {intro && <div>{intro}</div>}
+                              {listItems.length > 0 && (
+                                <ul style={{ margin: "0.25rem 0 0.5rem 1.25rem", padding: 0 }}>
+                                  {listItems.map((pt, i) => (
+                                    <li key={i} style={{ paddingLeft: "0.25rem", marginBottom: "0.125rem" }}>{pt}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </>
+                          );
+                        }
                       })()}
                     </div>
                   </div>

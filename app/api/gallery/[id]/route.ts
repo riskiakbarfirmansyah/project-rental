@@ -17,7 +17,10 @@ export async function PUT(
     const parsed = gallerySchema.partial().safeParse(body);
     if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
-    const item = await prisma.galleryItem.update({ where: { id }, data: parsed.data });
+    const data = { ...parsed.data };
+    if (data.carId === "") data.carId = null;
+
+    const item = await prisma.galleryItem.update({ where: { id }, data });
     return successResponse({ item });
   } catch (error) {
     console.error("Update gallery error:", error);

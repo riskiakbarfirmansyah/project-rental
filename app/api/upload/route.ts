@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     if (!file) return errorResponse("File tidak ditemukan");
 
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    if (!allowedTypes.includes(file.type)) {
+    if (!file.type || !allowedTypes.includes(file.type.toLowerCase())) {
       return errorResponse("Format file tidak didukung. Gunakan JPG, PNG, atau WebP");
     }
 
