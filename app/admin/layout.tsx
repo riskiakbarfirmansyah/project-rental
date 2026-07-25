@@ -16,6 +16,7 @@ const navItems = [
   { href: "/admin/config", label: "Konfigurasi", icon: "⚙️" },
 ];
 
+//buat deploy
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
