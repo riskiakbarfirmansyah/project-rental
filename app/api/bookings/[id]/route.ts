@@ -44,7 +44,6 @@ export async function PUT(
     let pricePerDay = booking.pricePerDay;
     let carName = booking.carName;
     let carBrand = booking.carBrand;
-    let carYear = booking.carYear;
     let carType = booking.carType;
 
     if (body.carId && body.carId !== booking.carId) {
@@ -53,7 +52,6 @@ export async function PUT(
       pricePerDay = car.pricePerDay;
       carName = car.name;
       carBrand = car.brand;
-      carYear = car.year;
       carType = car.type;
     }
 
@@ -76,7 +74,6 @@ export async function PUT(
         carId: body.carId !== undefined ? body.carId : booking.carId,
         carName,
         carBrand,
-        carYear,
         carType,
         pickupDate,
         duration,

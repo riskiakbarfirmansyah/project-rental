@@ -252,6 +252,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
+      {/* Desktop Toggle Button */}
+      {!isMobile && !sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          style={{
+            position: "fixed",
+            top: "2.5rem",
+            left: "1.5rem",
+            zIndex: 900,
+            width: "40px",
+            height: "40px",
+            borderRadius: "10px",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            boxShadow: "var(--shadow-sm)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "1.2rem",
+            color: "var(--text-primary)",
+            transition: "all 0.3s ease"
+          }}
+          aria-label="Buka Sidebar"
+          title="Buka Sidebar"
+        >
+          ☰
+        </button>
+      )}
+
       {/* Main Content */}
       <main
         className="admin-content"

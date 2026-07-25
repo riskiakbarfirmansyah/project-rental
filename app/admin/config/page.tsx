@@ -53,6 +53,12 @@ const CONFIG_FIELDS = [
   { section: "Halaman Booking (Pemesanan)", fields: [
     { key: "booking_promo_title", label: "Judul Promo / Info", type: "text" },
     { key: "booking_promo_desc", label: "Isi Promo (Gunakan tanda * untuk memisahkan poin)", type: "textarea" },
+    { key: "booking_admin1_name", label: "Nama Admin 1 (Default: Admin 1)", type: "text" },
+    { key: "booking_admin1_wa", label: "WhatsApp Admin 1 (628...)", type: "text" },
+    { key: "booking_admin2_name", label: "Nama Admin 2 (Default: Admin 2)", type: "text" },
+    { key: "booking_admin2_wa", label: "WhatsApp Admin 2 (628...)", type: "text" },
+    { key: "booking_admin3_name", label: "Nama Admin 3 (Opsional)", type: "text" },
+    { key: "booking_admin3_wa", label: "WhatsApp Admin 3 (Opsional)", type: "text" },
   ]},
   { section: "Kontak & Sosial Media", fields: [
     { key: "contact_phone", label: "Nomor Telepon", type: "text" },

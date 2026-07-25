@@ -115,7 +115,6 @@ export async function POST(request: NextRequest) {
         carId,
         carName: car.name,
         carBrand: car.brand,
-        carYear: car.year,
         carType: car.type,
         customerName,
         customerWa,

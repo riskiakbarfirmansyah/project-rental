@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 interface Car {
-  id: string; name: string; brand: string; year: number; type: string;
+  id: string; name: string; brand: string; type: string;
   pricePerDay: number; seats: number; transmission: string; fuel: string;
   description: string; withDriverOnly: boolean; imageUrl?: string;
 }
@@ -256,7 +256,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
   // Admin 1 diambil dari config (bisa diubah dari admin panel), Admin 2 fixed
   const [admins, setAdmins] = useState<AdminContact[]>([
     { label: "Admin 1", wa: "6281234567890" },
-    { label: "Admin 2", wa: "62895633818676" }
+    { label: "Admin 2", wa: "62895422140503" }
   ]);
   const [selectedAdminIdx, setSelectedAdminIdx] = useState(0);
   const adminWa = admins[selectedAdminIdx]?.wa || admins[0].wa;
@@ -292,13 +292,22 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
       const configData = cfgData.data?.config || {};
       setConfig(configData);
 
-      const wa = configData.whatsapp;
-      if (wa) {
-        setAdmins((prev) => {
-          const updated = [...prev];
-          updated[0] = { ...updated[0], wa: wa.replace(/[^0-9]/g, "") };
-          return updated;
-        });
+      const loadedAdmins: AdminContact[] = [];
+
+      const a1Name = configData.booking_admin1_name || "Admin 1";
+      const a1Wa = (configData.booking_admin1_wa || configData.whatsapp || "6281234567890").replace(/[^0-9]/g, "");
+      if (a1Wa) loadedAdmins.push({ label: a1Name, wa: a1Wa });
+
+      const a2Name = configData.booking_admin2_name || "Admin 2";
+      const a2Wa = (configData.booking_admin2_wa || "62895422140503").replace(/[^0-9]/g, "");
+      if (a2Wa) loadedAdmins.push({ label: a2Name, wa: a2Wa });
+
+      const a3Name = configData.booking_admin3_name;
+      const a3Wa = configData.booking_admin3_wa?.replace(/[^0-9]/g, "");
+      if (a3Name && a3Wa) loadedAdmins.push({ label: a3Name, wa: a3Wa });
+
+      if (loadedAdmins.length > 0) {
+        setAdmins(loadedAdmins);
       }
     }).finally(() => setLoading(false));
   }, [carId]);
@@ -367,7 +376,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
         `• No. WhatsApp: *${form.customerWa}*`,
         ``,
         `🚗 *ARMADA MOBIL*`,
-        `• Kendaraan: *${car.brand} ${car.name} (${car.year})*`,
+        `• Kendaraan: *${car.brand} ${car.name}*`,
         `• Tipe/Transmisi: ${car.type} · ${car.transmission === "AUTOMATIC" ? "Matic" : "Manual"}`,
         `• Layanan: *${form.driverOption === "lepas_kunci" ? "🗝️ Lepas Kunci (Tanpa Supir)" : "👨‍✈️ Dengan Supir"}*`,
         ``,
@@ -458,7 +467,7 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
 
               <div style={{ background: "var(--surface)", borderRadius: "var(--radius-xl)", padding: "1.5rem", border: "1px solid var(--border)" }}>
                 <h2 style={{ fontSize: "1.25rem", marginBottom: "0.25rem" }}>{car.brand} {car.name}</h2>
-                <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: "1.25rem" }}>{car.year} · {car.type}</p>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.8125rem", marginBottom: "1.25rem" }}>{car.type}</p>
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.7, marginBottom: "1.25rem" }}>{car.description}</p>
 
                 {/* Specs */}
@@ -467,7 +476,6 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                     { icon: "👥", label: "Kapasitas", val: `${car.seats} orang` },
                     { icon: "⚙️", label: "Transmisi", val: car.transmission === "AUTOMATIC" ? "Matic" : "Manual" },
                     { icon: "⛽", label: "BBM", val: car.fuel },
-                    { icon: "📅", label: "Tahun", val: car.year.toString() },
                   ].map((s) => (
                     <div key={s.label} style={{ padding: "0.75rem", background: "var(--surface-2)", borderRadius: "var(--radius-md)" }}>
                       <div style={{ fontSize: "1rem", marginBottom: "0.2rem" }}>{s.icon}</div>

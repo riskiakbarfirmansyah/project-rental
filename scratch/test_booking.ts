@@ -18,7 +18,7 @@ async function main() {
         carId: car.id,
         carName: car.name,
         carBrand: car.brand,
-        carYear: car.year,
+
         carType: car.type,
         customerName: "Test Pelanggan",
         customerWa: "081234567890",

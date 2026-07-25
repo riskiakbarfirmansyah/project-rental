@@ -15,7 +15,6 @@ export const loginSchema = z.object({
 export const carSchema = z.object({
   name: z.string().min(2, "Nama mobil minimal 2 karakter"),
   brand: z.string().min(1, "Brand wajib diisi"),
-  year: z.number().int().min(1990).max(new Date().getFullYear() + 1),
   pricePerDay: z.number().int().min(1, "Harga harus lebih dari 0"),
   seats: z.number().int().min(1).max(20),
   transmission: z.enum(["MANUAL", "AUTOMATIC"]),

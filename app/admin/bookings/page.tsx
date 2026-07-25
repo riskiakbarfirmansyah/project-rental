@@ -7,7 +7,6 @@ interface Booking {
   carId: string;
   carName: string;
   carBrand: string;
-  carYear: number;
   carType: string;
   customerName: string;
   customerWa: string;
@@ -1224,7 +1223,7 @@ export default function AdminBookingsPage() {
                 <div className="modal-detail-item">
                   <span className="modal-detail-label">Kendaraan</span>
                   <p className="modal-detail-val">{viewingBooking.carBrand} {viewingBooking.carName}</p>
-                  <span style={{ fontSize: "0.8125rem", color: "var(--text-secondary)" }}>Tahun {viewingBooking.carYear} · {viewingBooking.carType}</span>
+                  <span style={{ fontSize: "0.8125rem", color: "var(--text-secondary)" }}>{viewingBooking.carType}</span>
                 </div>
 
                 <div className="modal-detail-item">

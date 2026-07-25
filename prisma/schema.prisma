@@ -56,7 +56,6 @@ model Car {
   id           String       @id @default(cuid())
   name         String
   brand        String
-  year         Int
   type         String   @default("MOBIL")
   pricePerDay  Int
   seats        Int
@@ -82,7 +81,6 @@ model Booking {
   carId             String
   carName           String
   carBrand          String
-  carYear           Int
   carType           String
   customerName      String
   customerWa        String

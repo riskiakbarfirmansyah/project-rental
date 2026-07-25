@@ -48,7 +48,7 @@ async function main() {
     {
       name: "Agya",
       brand: "Toyota",
-      year: 2024,
+
       pricePerDay: 275000,
       seats: 5,
       transmission: "AUTOMATIC" as const,
@@ -60,7 +60,7 @@ async function main() {
     {
       name: "Brio",
       brand: "Honda",
-      year: 2024,
+
       pricePerDay: 300000,
       seats: 5,
       transmission: "AUTOMATIC" as const,
@@ -72,7 +72,7 @@ async function main() {
     {
       name: "All New Brio CVT 2025",
       brand: "Honda",
-      year: 2025,
+
       pricePerDay: 300000,
       seats: 5,
       transmission: "AUTOMATIC" as const,
@@ -84,7 +84,7 @@ async function main() {
     {
       name: "All New Avanza CVT 2025",
       brand: "Toyota",
-      year: 2025,
+
       pricePerDay: 350000,
       seats: 7,
       transmission: "AUTOMATIC" as const,
@@ -96,7 +96,7 @@ async function main() {
     {
       name: "Veloz Hybrid",
       brand: "Toyota",
-      year: 2025,
+
       pricePerDay: 425000,
       seats: 7,
       transmission: "AUTOMATIC" as const,
@@ -108,7 +108,7 @@ async function main() {
     {
       name: "Innova Reborn",
       brand: "Toyota",
-      year: 2024,
+
       pricePerDay: 500000,
       seats: 7,
       transmission: "AUTOMATIC" as const,
@@ -120,7 +120,7 @@ async function main() {
     {
       name: "Zenix HEV",
       brand: "Toyota",
-      year: 2025,
+
       pricePerDay: 625000,
       seats: 7,
       transmission: "AUTOMATIC" as const,
@@ -132,7 +132,7 @@ async function main() {
     {
       name: "Hiace",
       brand: "Toyota",
-      year: 2024,
+
       pricePerDay: 1300000,
       seats: 14,
       transmission: "MANUAL" as const,
@@ -242,7 +242,7 @@ async function main() {
       carId: cars[0].id,
       carName: cars[0].name,
       carBrand: cars[0].brand,
-      carYear: cars[0].year,
+
       carType: cars[0].type,
       customerName: "Budi Santoso",
       customerWa: "081234567890",

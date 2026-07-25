@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 interface Car {
-  id: string; name: string; brand: string; year: number; type: string;
+  id: string; name: string; brand: string; type: string;
   pricePerDay: number; seats: number; transmission: string; fuel: string;
   description: string; isAvailable: boolean; withDriverOnly: boolean; imageUrl?: string;
 }
@@ -12,7 +12,7 @@ const TRANSMISSIONS = ["MANUAL", "AUTOMATIC"];
 const FUELS = ["BENSIN", "DIESEL", "ELECTRIC", "HYBRID"];
 
 const EMPTY_FORM = {
-  name: "", brand: "", year: "2024", pricePerDay: "0", seats: "5",
+  name: "", brand: "", pricePerDay: "0", seats: "5",
   transmission: "AUTOMATIC", fuel: "BENSIN", description: "",
   imageUrl: "", isAvailable: true, withDriverOnly: false,
 };
@@ -48,7 +48,7 @@ export default function AdminCarsPage() {
   const openEdit = (car: Car) => {
     setEditing(car);
     setForm({
-      name: car.name, brand: car.brand, year: String(car.year),
+      name: car.name, brand: car.brand,
       pricePerDay: Number(car.pricePerDay).toLocaleString("id-ID"), seats: String(car.seats), transmission: car.transmission,
       fuel: car.fuel, description: car.description,
       imageUrl: car.imageUrl || "", isAvailable: car.isAvailable,
@@ -75,7 +75,6 @@ export default function AdminCarsPage() {
     setSubmitting(true); setError("");
     const payload = {
       ...form,
-      year: parseInt(String(form.year)) || 2024,
       pricePerDay: parseInt(String(form.pricePerDay).replace(/\D/g, "")) || 0,
       seats: parseInt(String(form.seats)) || 1,
     };
@@ -116,7 +115,6 @@ export default function AdminCarsPage() {
     .sort((a, b) => {
       if (sortBy === "PRICE_ASC") return a.pricePerDay - b.pricePerDay;
       if (sortBy === "PRICE_DESC") return b.pricePerDay - a.pricePerDay;
-      if (sortBy === "YEAR_DESC") return b.year - a.year;
       return 0;
     });
 
@@ -330,7 +328,7 @@ export default function AdminCarsPage() {
           font-weight: 700;
           color: var(--text-primary);
         }
-        .car-card-brand-year {
+        .car-card-brand {
           font-size: 0.75rem;
           color: var(--text-muted);
           font-weight: 700;
@@ -672,7 +670,6 @@ export default function AdminCarsPage() {
             <option value="DEFAULT">Urutkan: Default</option>
             <option value="PRICE_ASC">Tarif: Termurah</option>
             <option value="PRICE_DESC">Tarif: Termahal</option>
-            <option value="YEAR_DESC">Tahun: Terbaru</option>
           </select>
 
           {/* Grid/List Toggle */}
@@ -743,7 +740,7 @@ export default function AdminCarsPage() {
               {/* Card Body */}
               <div className="car-card-body">
                 <div>
-                  <div className="car-card-brand-year">{car.brand} · {car.year}</div>
+                  <div className="car-card-brand">{car.brand}</div>
                   <h3 className="car-card-title">{car.name}</h3>
                 </div>
 
@@ -833,7 +830,7 @@ export default function AdminCarsPage() {
                       <div>
                         <div style={{ fontWeight: 700, color: "var(--text-primary)" }}>{car.brand} {car.name}</div>
                         <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>
-                          Tahun {car.year} · <span style={{ textTransform: "capitalize" }}>{car.transmission.toLowerCase()}</span>
+                          <span style={{ textTransform: "capitalize" }}>{car.transmission.toLowerCase()}</span>
                         </div>
                       </div>
                     </div>
@@ -939,22 +936,6 @@ export default function AdminCarsPage() {
                       placeholder="Contoh: Avanza, Civic"
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      required
-                      style={{ borderRadius: "10px" }}
-                    />
-                  </div>
-
-                  {/* Tahun */}
-                  <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-                    <label className="form-label" htmlFor="car-year" style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>Tahun Pembuatan *</label>
-                    <input
-                      id="car-year"
-                      type="number"
-                      className="form-control"
-                      value={form.year}
-                      onChange={(e) => setForm({ ...form, year: e.target.value })}
-                      min={1990}
-                      max={2027}
                       required
                       style={{ borderRadius: "10px" }}
                     />
