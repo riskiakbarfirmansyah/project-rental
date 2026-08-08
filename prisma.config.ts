@@ -8,6 +8,8 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: env("DIRECT_URL") || env("DATABASE_URL"),
+    // DIRECT_URL dipakai untuk prisma migrate/db push (bypass pooler)
+    // DATABASE_URL (pooler) dipakai oleh PrismaClient di runtime via adapter
+    url: env("DIRECT_URL"),
   },
 });

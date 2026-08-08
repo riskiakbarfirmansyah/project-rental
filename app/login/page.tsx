@@ -1,14 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [fromPath, setFromPath] = useState<string | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
+
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Baca ?from= param dari URL di client-side (hindari hydration mismatch)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get("from");
+    if (from) {
+      setFromPath(from);
+      setSessionExpired(true);
+    }
+  }, []);
+
+  // Redirect ke /admin jika sudah login
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.data.user.role === "ADMIN") {
+          router.replace(fromPath || "/admin");
+        }
+      })
+      .catch(() => {});
+  }, [router, fromPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +47,7 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (data.success && data.data.user.role === "ADMIN") {
-        router.push("/admin");
+        router.push(fromPath || "/admin");
         router.refresh();
       } else if (data.success) {
         setError("Akses dibatasi. Halaman ini khusus untuk administrator.");
@@ -77,6 +102,25 @@ export default function LoginPage() {
             Silakan masuk untuk mengelola sistem rental.
           </p>
         </div>
+
+        {/* Notifikasi sesi berakhir */}
+        {sessionExpired && !error && (
+          <div id="session-expired-notice" style={{
+            padding: "0.75rem 1rem",
+            marginBottom: "1.5rem",
+            background: "#fffbeb",
+            border: "1px solid #fde68a",
+            borderRadius: "6px",
+            color: "#92400e",
+            fontSize: "0.8125rem",
+            fontWeight: 600,
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem"
+          }}>
+            🔒 Sesi Anda telah berakhir. Silakan login kembali.
+          </div>
+        )}
 
         {/* Alert Error */}
         {error && (

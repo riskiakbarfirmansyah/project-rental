@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { successResponse, errorResponse } from "@/lib/utils";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { createServerClient } from "@/lib/supabase-server";
+
+const BUCKET_NAME = "uploads";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     const allowedExtensions = ["jpg", "jpeg", "png", "webp", "gif", "jfif", "heic", "svg"];
     const allowedMimeTypes = [
       "image/jpeg", "image/jpg", "image/png", "image/webp",
-      "image/gif", "image/pjpeg", "image/jfif", "image/heic", "image/svg+xml"
+      "image/gif", "image/pjpeg", "image/jfif", "image/heic", "image/svg+xml",
     ];
 
     const isMimeValid = fileType ? allowedMimeTypes.includes(fileType) : false;
@@ -43,22 +44,28 @@ export async function POST(request: NextRequest) {
 
     const cleanExt = ext.replace(/[^a-zA-Z0-9]/g, "") || "jpg";
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${cleanExt}`;
+    const mimeType = fileType || `image/${cleanExt === "jpg" ? "jpeg" : cleanExt}`;
 
-    try {
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await mkdir(uploadDir, { recursive: true });
-      await writeFile(path.join(uploadDir, filename), buffer);
+    // Upload ke Supabase Storage
+    const supabase = createServerClient();
+    const { data, error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(filename, buffer, {
+        contentType: mimeType,
+        upsert: false,
+      });
 
-      const url = `/uploads/${filename}`;
-      return successResponse({ url }, 201);
-    } catch (fsError: any) {
-      if (fsError.code === "EROFS" || fsError.message?.includes("read-only") || process.env.VERCEL) {
-        const mime = fileType || `image/${cleanExt === "jpg" ? "jpeg" : cleanExt}`;
-        const base64Url = `data:${mime};base64,${buffer.toString("base64")}`;
-        return successResponse({ url: base64Url }, 201);
-      }
-      throw fsError;
+    if (error) {
+      console.error("Supabase Storage upload error:", error);
+      return errorResponse(`Gagal upload file: ${error.message}`, 500);
     }
+
+    // Dapatkan public URL
+    const { data: publicUrlData } = supabase.storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(data.path);
+
+    return successResponse({ url: publicUrlData.publicUrl }, 201);
   } catch (error: any) {
     console.error("Upload error:", error);
     return errorResponse(error?.message || "Terjadi kesalahan saat upload", 500);
