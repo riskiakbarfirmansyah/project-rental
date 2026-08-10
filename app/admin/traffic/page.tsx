@@ -367,8 +367,16 @@ export default function AdminTrafficPage() {
         />
         <MiniStat
           label="Jam Tersibuk" icon="⚡" color="#10b981"
-          value={data?.summary.peakHour?.split(" ")[0] || "-"}
-          sub={data?.summary.peakHour || "Belum ada data hari ini"}
+          value={
+            data?.summary.peakHour
+              ? data.summary.peakHour.replace(/\s*\(.*\)$/, "")
+              : "-"
+          }
+          sub={
+            data?.summary.peakHour
+              ? data.summary.peakHour.match(/\(.*\)/)?.[0] || ""
+              : "Belum ada data hari ini"
+          }
         />
       </div>
 

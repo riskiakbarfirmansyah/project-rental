@@ -6,6 +6,25 @@ function getStartOfDay(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
 }
 
+/** Convert a UTC Date to its hour in WIB (UTC+7) */
+function toWIBHour(date: Date): number {
+  return (date.getUTCHours() + 7) % 24;
+}
+
+/** Build a WIB start-of-day (midnight WIB) as UTC Date for a given UTC date */
+function wibStartOfDay(utcDate: Date): Date {
+  // WIB midnight = UTC 17:00 of the previous day
+  const d = new Date(Date.UTC(
+    utcDate.getUTCFullYear(),
+    utcDate.getUTCMonth(),
+    utcDate.getUTCDate(),
+    0, 0, 0, 0
+  ));
+  // Subtract 7 hours to get WIB 00:00 as UTC
+  d.setUTCHours(d.getUTCHours() - 7);
+  return d;
+}
+
 export async function GET(request: Request) {
   try {
     const auth = await requireAdmin();
@@ -128,14 +147,14 @@ export async function GET(request: Request) {
       take: 5,
     });
 
-    // --- Peak hour (today) ---
+    // --- Peak hour (today, in WIB timezone) ---
     const hourCounts: Record<number, number> = {};
     const todayRecords = await prisma.pageView.findMany({
       where: { createdAt: { gte: todayStart } },
       select: { createdAt: true },
     });
     todayRecords.forEach((r) => {
-      const h = r.createdAt.getHours();
+      const h = toWIBHour(r.createdAt); // convert UTC → WIB hour
       hourCounts[h] = (hourCounts[h] || 0) + 1;
     });
     const peakHour = Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0];
@@ -149,7 +168,14 @@ export async function GET(request: Request) {
         today: { views: todayViews, uniqueIps: todayUnique.length },
         yesterday: { views: yesterdayViews, uniqueIps: yesterdayUnique.length },
         inRange: { views: totalInRange, uniqueIps: uniqueInRange.length },
-        peakHour: peakHour ? `${String(peakHour[0]).padStart(2, "0")}:00 (${peakHour[1]} views)` : "-",
+        peakHour: peakHour
+          ? (() => {
+              const h = parseInt(peakHour[0]);
+              const hStart = `${String(h).padStart(2, "0")}:00`;
+              const hEnd   = `${String((h + 1) % 24).padStart(2, "0")}:00`;
+              return `${hStart} – ${hEnd} (${peakHour[1]} views)`;
+            })()
+          : "-",
       },
       topPages: topPages.map((p) => ({ page: p.page, count: p._count.page })),
       topReferrers: topReferrers.map((r) => ({
