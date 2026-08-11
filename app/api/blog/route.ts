@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
     if ("error" in auth) return errorResponse(auth.error, auth.status);
 
     const body = await request.json();
-    const parsed = blogSchema.safeParse(body);
+    const { imageFocalPoint, ...bodyRest } = body;
+    const parsed = blogSchema.safeParse(bodyRest);
     if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const { title, slug, publishedAt, ...rest } = parsed.data;
@@ -60,15 +61,16 @@ export async function POST(request: NextRequest) {
         slug: finalSlug, 
         ...rest, 
         publishedAt: publishedAt ? new Date(publishedAt) : null,
-        authorId: auth.user.id 
+        authorId: auth.user.id,
+        ...(imageFocalPoint ? { imageFocalPoint } : {}),
       },
       include: { author: { select: { id: true, name: true } } },
     });
 
     revalidatePath("/blog");
     return successResponse({ post }, 201);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Create blog error:", error);
-    return errorResponse("Terjadi kesalahan server", 500);
+    return errorResponse(error?.message || "Terjadi kesalahan server", 500);
   }
 }

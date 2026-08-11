@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      return errorResponse("Ukuran file maksimal 10MB.");
+      return errorResponse("Ukuran file maksimal 5MB.");
     }
 
     const bytes = await file.arrayBuffer();

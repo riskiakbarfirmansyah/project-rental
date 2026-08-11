@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import RichTextEditor from "@/components/RichTextEditor";
+import CoverImageAdjuster from "@/components/CoverImageAdjuster";
 
 interface BlogPost {
   id: string; title: string; slug: string; excerpt: string;
@@ -13,7 +14,7 @@ interface BlogPost {
 }
 
 const EMPTY = { 
-  title: "", excerpt: "", content: "", imageUrl: "", 
+  title: "", excerpt: "", content: "", imageUrl: "", imageFocalPoint: "50% 50%",
   category: "", tags: "", metaTitle: "", metaDescription: "",
   publishedAt: "", isPublished: false 
 };
@@ -102,6 +103,7 @@ export default function AdminBlogPage() {
         excerpt: p.excerpt || "", 
         content: p.content || "", 
         imageUrl: p.imageUrl || "", 
+        imageFocalPoint: p.imageFocalPoint || "50% 50%",
         category: p.category || "",
         tags: p.tags || "",
         metaTitle: p.metaTitle || "",
@@ -317,34 +319,41 @@ export default function AdminBlogPage() {
 
               {/* Settings Grid */}
               <div className="editor-settings-grid">
-                
-                {/* Cover Image */}
+                      {/* Cover Image */}
                 <div className="panel">
                   <h3>Cover Image</h3>
                   {form.imageUrl ? (
-                    <div style={{ position: "relative", width: "100%", height: 160, borderRadius: 8, overflow: "hidden", marginBottom: "1rem", border: "1px solid var(--border)" }}>
-                      <Image src={form.imageUrl} alt="Cover" fill style={{ objectFit: "cover" }} sizes="340px" />
-                      <button 
-                        onClick={() => handleFieldChange("imageUrl", "")}
-                        style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", color: "white", border: "none", borderRadius: "50%", width: 28, height: 28, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                      >✕</button>
-                    </div>
+                    <CoverImageAdjuster
+                      imageUrl={form.imageUrl}
+                      focalPoint={form.imageFocalPoint}
+                      onChange={(fp) => handleFieldChange("imageFocalPoint", fp)}
+                      onRemove={() => {
+                        handleFieldChange("imageUrl", "");
+                        handleFieldChange("imageFocalPoint", "50% 50%");
+                        if (coverFileRef.current) coverFileRef.current.value = "";
+                      }}
+                      uploading={coverUploading}
+                      onUploadClick={() => coverFileRef.current?.click()}
+                    />
                   ) : (
-                    <div style={{ height: 160, borderRadius: 8, border: "2px dashed var(--border)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem", background: "var(--surface-2)" }}>
-                      <span style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>Belum ada cover image</span>
-                    </div>
+                    <>
+                      <div style={{ height: 160, borderRadius: 8, border: "2px dashed var(--border)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem", background: "var(--surface-2)" }}>
+                        <span style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>Belum ada cover image</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        style={{ width: "100%" }}
+                        onClick={() => coverFileRef.current?.click()}
+                        disabled={coverUploading}
+                      >
+                        {coverUploading ? "Mengunggah..." : "Unggah Gambar"}
+                      </button>
+                    </>
                   )}
                   <input type="file" ref={coverFileRef} accept="image/*" onChange={handleCoverUpload} style={{ display: "none" }} />
-                  <button 
-                    type="button" 
-                    className="btn btn-outline" 
-                    style={{ width: "100%" }} 
-                    onClick={() => coverFileRef.current?.click()}
-                    disabled={coverUploading}
-                  >
-                    {coverUploading ? "Mengunggah..." : form.imageUrl ? "Ganti Gambar" : "Unggah Gambar"}
-                  </button>
                 </div>
+
 
                 {/* Excerpt */}
                 <div className="panel">

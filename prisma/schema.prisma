@@ -113,6 +113,7 @@ model BlogPost {
   content         String    @db.Text
   excerpt         String    @db.Text
   imageUrl        String?
+  imageFocalPoint String?   @default("50% 50%")
   category        String?
   tags            String?
   metaTitle       String?

@@ -33,20 +33,24 @@ export async function PUT(
 
     const { slug } = await params;
     const body = await request.json();
-    const parsed = blogSchema.partial().safeParse(body);
+    const { imageFocalPoint, ...bodyRest } = body;
+    const parsed = blogSchema.partial().safeParse(bodyRest);
     if (!parsed.success) return errorResponse(parsed.error.issues[0].message);
 
     const dataToUpdate: any = { ...parsed.data };
     if (dataToUpdate.publishedAt !== undefined) {
       dataToUpdate.publishedAt = dataToUpdate.publishedAt ? new Date(dataToUpdate.publishedAt) : null;
     }
+    if (imageFocalPoint !== undefined) {
+      dataToUpdate.imageFocalPoint = imageFocalPoint;
+    }
 
     const post = await prisma.blogPost.update({ where: { slug }, data: dataToUpdate });
     revalidatePath("/blog");
     return successResponse({ post });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Update post error:", error);
-    return errorResponse("Terjadi kesalahan server", 500);
+    return errorResponse(error?.message || "Terjadi kesalahan server", 500);
   }
 }
 
