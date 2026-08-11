@@ -6,8 +6,19 @@ import { createClient } from "@supabase/supabase-js";
  * Dipakai untuk: upload file ke Storage, operasi admin, bypass RLS.
  */
 export function createServerClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl) {
+    throw new Error(
+      "Missing env: NEXT_PUBLIC_SUPABASE_URL. Pastikan sudah di-set di Vercel Dashboard > Settings > Environment Variables."
+    );
+  }
+  if (!serviceRoleKey) {
+    throw new Error(
+      "Missing env: SUPABASE_SERVICE_ROLE_KEY. Pastikan sudah di-set di Vercel Dashboard > Settings > Environment Variables."
+    );
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey);
 }
