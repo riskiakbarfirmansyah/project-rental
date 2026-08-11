@@ -2,8 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Cron job: Reset (hapus) data page views setiap jam 00:00 WIB.
- * Data yang dihapus = semua record SEBELUM hari ini (WIB).
+ * Cron job: Membersihkan data page views lama setiap jam 00:00 WIB.
+ * Data yang dihapus = semua record LEBIH DARI 30 HARI yang lalu.
+ * Data 30 hari terakhir (termasuk kemarin & 7 hari) tetap disimpan untuk analytics.
  * Dipanggil oleh Vercel Cron sesuai konfigurasi di vercel.json.
  */
 export async function GET(request: NextRequest) {
@@ -27,11 +28,15 @@ export async function GET(request: NextRequest) {
       Date.UTC(wibNow.getFullYear(), wibNow.getMonth(), wibNow.getDate()) - wibOffset * 60000
     );
 
-    // Hapus semua page views sebelum hari ini WIB
+    // Hapus page views yang lebih dari 30 hari yang lalu
+    // Ini menjaga data kemarin, 7 hari, dan 30 hari tetap ada untuk analytics
+    const thirtyDaysAgo = new Date(todayStartWIB);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
     const deleted = await prisma.pageView.deleteMany({
       where: {
         createdAt: {
-          lt: todayStartWIB,
+          lt: thirtyDaysAgo,
         },
       },
     });
