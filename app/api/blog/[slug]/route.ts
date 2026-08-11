@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { blogSchema } from "@/lib/validations";
 import { requireAdmin } from "@/lib/auth";
 import { successResponse, errorResponse } from "@/lib/utils";
+import { revalidatePath } from "next/cache";
 
 export async function GET(
   _request: NextRequest,
@@ -41,6 +42,7 @@ export async function PUT(
     }
 
     const post = await prisma.blogPost.update({ where: { slug }, data: dataToUpdate });
+    revalidatePath("/blog");
     return successResponse({ post });
   } catch (error) {
     console.error("Update post error:", error);
@@ -58,6 +60,7 @@ export async function DELETE(
 
     const { slug } = await params;
     await prisma.blogPost.delete({ where: { slug } });
+    revalidatePath("/blog");
     return successResponse({ message: "Artikel berhasil dihapus" });
   } catch (error) {
     console.error("Delete post error:", error);

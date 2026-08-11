@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { blogSchema } from "@/lib/validations";
 import { requireAdmin, getAuthUser } from "@/lib/auth";
 import { successResponse, errorResponse, generateSlug } from "@/lib/utils";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: NextRequest) {
   try {
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
       include: { author: { select: { id: true, name: true } } },
     });
 
+    revalidatePath("/blog");
     return successResponse({ post }, 201);
   } catch (error) {
     console.error("Create blog error:", error);
