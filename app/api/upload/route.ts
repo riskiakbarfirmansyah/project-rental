@@ -34,9 +34,9 @@ export async function POST(request: NextRequest) {
       return errorResponse("Format file tidak didukung. Gunakan foto berformat JPG, PNG, WEBP, GIF, atau JFIF.");
     }
 
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 2 * 1024 * 1024; // 2MB
     if (file.size > maxSize) {
-      return errorResponse("Ukuran file maksimal 5MB.");
+      return errorResponse("Ukuran file terlalu besar! Maksimal upload adalah 2MB. Silakan kompres gambar terlebih dahulu.");
     }
 
     const bytes = await file.arrayBuffer();

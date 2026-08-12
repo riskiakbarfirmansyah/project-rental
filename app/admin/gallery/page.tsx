@@ -102,10 +102,10 @@ export default function AdminGalleryPage() {
       return;
     }
 
-    // Validate size (max 10MB)
-    const maxSize = 10 * 1024 * 1024;
+    // Validate size (max 2MB)
+    const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
-      setAddError("Ukuran file terlalu besar (Maksimal 10MB).");
+      setAddError(`⚠️ Ukuran file terlalu besar! (${(file.size / 1024 / 1024).toFixed(1)}MB). Maksimal upload adalah 2MB. Silakan kompres gambar terlebih dahulu.`);
       return;
     }
 
@@ -183,6 +183,11 @@ export default function AdminGalleryPage() {
   const handleEditUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Validate 2MB client-side
+    if (file.size > 2 * 1024 * 1024) {
+      alert(`⚠️ Ukuran file terlalu besar! (${(file.size / 1024 / 1024).toFixed(1)}MB)\nMaksimal upload adalah 2MB. Silakan kompres gambar terlebih dahulu.`);
+      return;
+    }
     setEditUploading(true);
     try {
       const fd = new FormData(); fd.append("file", file);
@@ -747,6 +752,22 @@ export default function AdminGalleryPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Download existing photo */}
+                {editItem.imageUrl && (
+                  <div className="form-group">
+                    <a
+                      href={editItem.imageUrl}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline btn-sm"
+                      style={{ display: "block", textAlign: "center", borderRadius: "10px" }}
+                    >
+                      ⬇️ Download Foto Saat Ini
+                    </a>
+                  </div>
+                )}
 
                 {/* Modal actions */}
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "0.5rem", borderTop: "1px solid var(--border)", paddingTop: "1.25rem" }}>

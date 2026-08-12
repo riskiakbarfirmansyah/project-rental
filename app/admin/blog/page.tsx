@@ -129,7 +129,8 @@ export default function AdminBlogPage() {
 
     const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!validTypes.includes(file.type)) return alert("Format file harus JPG, PNG, atau WEBP");
-    if (file.size > 5 * 1024 * 1024) return alert("Ukuran maksimal file 5MB");
+    if (file.size > 2 * 1024 * 1024) return alert(`⚠️ Ukuran file terlalu besar! (${(file.size / 1024 / 1024).toFixed(1)}MB)
+Maksimal upload adalah 2MB. Silakan kompres gambar terlebih dahulu.`);
 
     setCoverUploading(true);
     const fd = new FormData(); fd.append("file", file);
@@ -352,6 +353,18 @@ export default function AdminBlogPage() {
                     </>
                   )}
                   <input type="file" ref={coverFileRef} accept="image/*" onChange={handleCoverUpload} style={{ display: "none" }} />
+                  {form.imageUrl && (
+                    <a
+                      href={form.imageUrl}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline btn-sm"
+                      style={{ width: "100%", textAlign: "center", marginTop: "0.5rem" }}
+                    >
+                      ⬇️ Download Cover Image
+                    </a>
+                  )}
                 </div>
 
 

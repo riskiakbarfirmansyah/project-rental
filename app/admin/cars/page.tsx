@@ -61,12 +61,18 @@ export default function AdminCarsPage() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Client-side 2MB validation
+    if (file.size > 2 * 1024 * 1024) {
+      alert(`⚠️ Ukuran file terlalu besar! (${(file.size / 1024 / 1024).toFixed(1)}MB)\nMaksimal upload adalah 2MB. Silakan kompres gambar terlebih dahulu.`);
+      return;
+    }
     setUploading(true);
     const fd = new FormData();
     fd.append("file", file);
     const res = await fetch("/api/upload", { method: "POST", body: fd });
     const data = await res.json();
     if (data.success) setForm((f) => ({ ...f, imageUrl: data.data.url }));
+    else alert(data.error || "Gagal mengunggah gambar");
     setUploading(false);
   };
 
@@ -1047,17 +1053,31 @@ export default function AdminCarsPage() {
                   
                   {form.imageUrl ? (
                     /* Image preview mode */
-                    <div className="image-preview-wrapper">
-                      <img src={form.imageUrl} alt="Car Preview" />
-                      <button
-                        type="button"
-                        className="btn-remove-image"
-                        onClick={() => setForm({ ...form, imageUrl: "" })}
-                        title="Hapus Gambar"
-                      >
-                        ✕
-                      </button>
-                    </div>
+                    <>
+                      <div className="image-preview-wrapper">
+                        <img src={form.imageUrl} alt="Car Preview" />
+                      </div>
+                      <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                        <button
+                          type="button"
+                          className="btn btn-outline btn-sm"
+                          onClick={() => setForm({ ...form, imageUrl: "" })}
+                          style={{ flex: 1 }}
+                        >
+                          ❌ Hapus Gambar
+                        </button>
+                        <a
+                          href={form.imageUrl}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-outline btn-sm"
+                          style={{ flex: 1, textAlign: "center" }}
+                        >
+                          ⬇️ Download
+                        </a>
+                      </div>
+                    </>
                   ) : (
                     /* Upload Area */
                     <div className="drag-upload-area" onClick={() => fileRef.current?.click()}>
@@ -1066,7 +1086,7 @@ export default function AdminCarsPage() {
                         {uploading ? "Mengunggah..." : "Pilih file gambar untuk diunggah"}
                       </div>
                       <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                        Mendukung file PNG, JPG, JPEG maks 5MB
+                        Mendukung file PNG, JPG, JPEG maks 2MB
                       </div>
                       <input
                         type="file"
