@@ -11,14 +11,21 @@ export const revalidate = 0;
 export const metadata: Metadata = { title: "Galeri" };
 
 export default async function GalleryPage() {
+  let config: Record<string, string> = {};
   let items: { id: string; title: string; description?: string; imageUrl: string; car?: { name: string; brand: string } }[] = [];
   try {
-    const rawItems = await prisma.galleryItem.findMany({
-      include: {
-        car: { select: { name: true, brand: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const [rawItems, configsData] = await Promise.all([
+      prisma.galleryItem.findMany({
+        include: {
+          car: { select: { name: true, brand: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.siteConfig.findMany()
+    ]);
+    
+    config = configsData.reduce((acc, c) => ({ ...acc, [c.key]: c.value }), {} as Record<string, string>);
+
     items = rawItems.map((item) => ({
       id: item.id,
       title: item.title,
@@ -37,9 +44,9 @@ export default async function GalleryPage() {
       {/* Hero */}
       <section style={{ background: "var(--gradient-hero)", padding: "5rem 0 3rem" }}>
         <div className="container" style={{ textAlign: "center" }}>
-          <h1 style={{ color: "white", marginBottom: "1rem" }}>Galeri Armada Kami</h1>
+          <h1 style={{ color: "white", marginBottom: "1rem" }}>{config.galeri_title || "Galeri Armada Kami"}</h1>
           <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "1.125rem", maxWidth: 500, margin: "0 auto" }}>
-            Lihat koleksi lengkap armada kendaraan kami yang terawat dan siap melayani perjalanan Anda.
+            {config.galeri_desc || "Lihat koleksi lengkap armada kendaraan kami yang terawat dan siap melayani perjalanan Anda."}
           </p>
         </div>
       </section>

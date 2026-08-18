@@ -12,6 +12,7 @@ interface Car {
 
 export default function ServicesPage() {
   const [cars, setCars] = useState<Car[]>([]);
+  const [config, setConfig] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("default");
@@ -21,15 +22,16 @@ export default function ServicesPage() {
     if (search) params.set("search", search);
 
     setLoading(true);
-    fetch(`/api/cars?${params}`)
-      .then((r) => r.json())
-      .then((d) => {
-        let data: Car[] = d.data?.cars || [];
-        if (sort === "price-asc") data = [...data].sort((a, b) => a.pricePerDay - b.pricePerDay);
-        if (sort === "price-desc") data = [...data].sort((a, b) => b.pricePerDay - a.pricePerDay);
-        setCars(data);
-      })
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch(`/api/cars?${params}`).then((r) => r.json()),
+      fetch("/api/config").then((r) => r.json())
+    ]).then(([carsRes, configRes]) => {
+      let data: Car[] = carsRes.data?.cars || [];
+      if (sort === "price-asc") data = [...data].sort((a, b) => a.pricePerDay - b.pricePerDay);
+      if (sort === "price-desc") data = [...data].sort((a, b) => b.pricePerDay - a.pricePerDay);
+      setCars(data);
+      setConfig(configRes.data?.config || {});
+    }).finally(() => setLoading(false));
   }, [search, sort]);
 
   return (
@@ -41,9 +43,9 @@ export default function ServicesPage() {
         background: "var(--gradient-hero)", padding: "5rem 0 3rem"
       }}>
         <div className="container" style={{ textAlign: "center" }}>
-          <h1 style={{ color: "white", marginBottom: "1rem" }}>Layanan & Harga Sewa Mobil</h1>
+          <h1 style={{ color: "white", marginBottom: "1rem" }}>{config.layanan_title || "Layanan & Harga Sewa Mobil"}</h1>
           <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "1.125rem", maxWidth: 500, margin: "0 auto" }}>
-            Temukan kendaraan yang tepat untuk kebutuhan Anda. Berbagai pilihan tersedia dengan harga kompetitif.
+            {config.layanan_desc || "Temukan kendaraan yang tepat untuk kebutuhan Anda. Berbagai pilihan tersedia dengan harga kompetitif."}
           </p>
         </div>
       </section>

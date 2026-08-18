@@ -60,6 +60,14 @@ const CONFIG_FIELDS = [
     { key: "booking_admin3_name", label: "Nama Admin 3 (Opsional)", type: "text" },
     { key: "booking_admin3_wa", label: "WhatsApp Admin 3 (Opsional)", type: "text" },
   ]},
+  { section: "Halaman Lainnya (Layanan, Galeri, Blog)", fields: [
+    { key: "layanan_title", label: "Judul Halaman Layanan", type: "text" },
+    { key: "layanan_desc", label: "Deskripsi Halaman Layanan", type: "textarea" },
+    { key: "galeri_title", label: "Judul Halaman Galeri", type: "text" },
+    { key: "galeri_desc", label: "Deskripsi Halaman Galeri", type: "textarea" },
+    { key: "blog_title", label: "Judul Halaman Blog", type: "text" },
+    { key: "blog_desc", label: "Deskripsi Halaman Blog", type: "textarea" },
+  ]},
   { section: "Kontak & Sosial Media", fields: [
     { key: "contact_phone", label: "Nomor Telepon", type: "text" },
     { key: "contact_email", label: "Email", type: "text" },
@@ -72,7 +80,7 @@ const CONFIG_FIELDS = [
   ]},
 ];
 
-const SECTION_ICONS = ["🌐", "🚀", "🏢", "💎", "🚗", "🛡️", "📝", "📞"];
+const SECTION_ICONS = ["🌐", "🚀", "🏢", "💎", "🚗", "🛡️", "📝", "📄", "📞"];
 
 export default function AdminConfigPage() {
   const [config, setConfig] = useState<Record<string, string>>({});

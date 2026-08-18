@@ -10,12 +10,17 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Blog" };
 
 export default async function BlogPage() {
-  const posts = await prisma.blogPost.findMany({
-    where: { isPublished: true },
-    include: { author: { select: { id: true, name: true, avatar: true } } },
-    orderBy: { createdAt: "desc" },
-    take: 12,
-  });
+  const [posts, configsData] = await Promise.all([
+    prisma.blogPost.findMany({
+      where: { isPublished: true },
+      include: { author: { select: { id: true, name: true, avatar: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 12,
+    }),
+    prisma.siteConfig.findMany()
+  ]);
+
+  const config = configsData.reduce((acc, c) => ({ ...acc, [c.key]: c.value }), {} as Record<string, string>);
 
   return (
     <>
@@ -23,9 +28,9 @@ export default async function BlogPage() {
 
       <section style={{ background: "var(--gradient-hero)", padding: "6rem 0 4rem" }}>
         <div className="container" style={{ textAlign: "center" }}>
-          <h1 style={{ color: "white", marginBottom: "1rem", fontSize: "2.5rem", fontWeight: 800 }}>Blog & Tips Perjalanan</h1>
+          <h1 style={{ color: "white", marginBottom: "1rem", fontSize: "2.5rem", fontWeight: 800 }}>{config.blog_title || "Blog & Tips Perjalanan"}</h1>
           <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "1.125rem", maxWidth: 600, margin: "0 auto" }}>
-            Tips, panduan, dan informasi menarik seputar sewa mobil dan perjalanan di Indonesia.
+            {config.blog_desc || "Tips, panduan, dan informasi menarik seputar sewa mobil dan perjalanan di Indonesia."}
           </p>
         </div>
       </section>
