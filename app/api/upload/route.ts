@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
     const isMimeValid = fileType ? allowedMimeTypes.includes(fileType) : false;
     const isExtValid = allowedExtensions.includes(ext);
 
+    // supaya tidak ada file yang lolos validasi, harus salah satu valid
     if (!isMimeValid && !isExtValid) {
       return errorResponse("Format file tidak didukung. Gunakan foto berformat JPG, PNG, WEBP, GIF, atau JFIF.");
     }
