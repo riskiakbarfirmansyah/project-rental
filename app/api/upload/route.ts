@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { successResponse, errorResponse } from "@/lib/utils";
 import { createServerClient } from "@/lib/supabase-server";
 
+//bucket name supabase storage
 const BUCKET_NAME = "uploads";
 
 export async function POST(request: NextRequest) {
