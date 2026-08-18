@@ -109,7 +109,8 @@ export default async function HomePage() {
       <HeroSection
         heroTitle={config.hero_title}
         heroSubtitle={config.hero_subtitle}
-        featuredReview={reviews[0] || null}
+        featuredReview={reviews.length > 0 ? reviews[0] : null}
+        googleRating={config.google_review_rating || "4.7"}
       />
 
       {/* FEATURED CARS */}
@@ -209,6 +210,7 @@ export default async function HomePage() {
         <ReviewsSection
           reviews={reviews}
           mapsEmbedUrl={mapsUrl}
+          googleRating={config.google_review_rating || "4.7"}
         />
       </ScrollReveal>
 

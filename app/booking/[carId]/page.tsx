@@ -726,12 +726,32 @@ export default function BookingPage({ params }: { params: Promise<{ carId: strin
                     <div style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.8rem", marginBottom: "0.25rem" }}>
                       Rp {car.pricePerDay.toLocaleString("id-ID")} × {duration} hari
                     </div>
-                    <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.8125rem" }}>Estimasi total biaya</div>
+                    <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.8125rem" }}>Estimasi total biaya{form.driverOption === "dengan_supir" ? " *" : ""}</div>
                   </div>
                   <div style={{ fontFamily: "Sora, sans-serif", fontWeight: 800, fontSize: "1.625rem", color: "#fbbf24" }}>
-                    Rp {totalPrice.toLocaleString("id-ID")}
+                    Rp {totalPrice.toLocaleString("id-ID")}{form.driverOption === "dengan_supir" ? <span style={{ fontSize: "1rem", fontWeight: 600 }}> *</span> : ""}
                   </div>
                 </div>
+
+                {/* Driver Fee Disclaimer */}
+                {form.driverOption === "dengan_supir" && (
+                  <div style={{
+                    display: "flex", alignItems: "flex-start", gap: "0.75rem",
+                    padding: "0.875rem 1rem",
+                    background: "#fffbeb",
+                    borderRadius: "var(--radius-md)",
+                    border: "1px solid #fcd34d",
+                    fontSize: "0.8125rem",
+                    color: "#92400e",
+                    lineHeight: 1.6,
+                  }}>
+                    <span style={{ fontSize: "1rem", marginTop: "0.1rem", flexShrink: 0 }}>⚠️</span>
+                    <span>
+                      <strong>* Driver fee belum termasuk</strong> dalam estimasi di atas. Biaya supir ditentukan berdasarkan jarak dan waktu kerja.
+                      Untuk konfirmasi lebih lanjut, silakan hubungi admin via WhatsApp setelah pesanan dikirim.
+                    </span>
+                  </div>
+                )}
 
                 {/* Info Discount Note */}
                 <div style={{ 

@@ -11,6 +11,7 @@ interface Review {
 interface ReviewsSectionProps {
   reviews: Review[];
   mapsEmbedUrl?: string;
+  googleRating?: string;
 }
 
 const Stars = ({ rating }: { rating: number }) => (
@@ -30,7 +31,7 @@ const GoogleIcon = () => (
 
 const DEFAULT_MAPS_EMBED = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3959.4643530059825!2d110.43101067365318!3d-7.072036992930665!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e708f0077870a03%3A0xc7f930af53eb3867!2sBella%20Belly%20Trans%20Co!5e0!3m2!1sen!2sid!4v1783429219539!5m2!1sen!2sid";
 
-export default function ReviewsSection({ reviews, mapsEmbedUrl }: ReviewsSectionProps) {
+export default function ReviewsSection({ reviews, mapsEmbedUrl, googleRating = "4.7" }: ReviewsSectionProps) {
   const activeMapsUrl = mapsEmbedUrl || DEFAULT_MAPS_EMBED;
 
   const avgRating = reviews.length > 0
@@ -59,13 +60,10 @@ export default function ReviewsSection({ reviews, mapsEmbedUrl }: ReviewsSection
             }}>
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "4rem", fontWeight: 800, color: "var(--text)", lineHeight: 1 }}>
-                  {avgRating}
+                  {googleRating}
                 </div>
                 <div style={{ margin: "0.375rem 0" }}>
                   <Stars rating={5} />
-                </div>
-                <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                  {reviews.length} Google Reviews
                 </div>
               </div>
 

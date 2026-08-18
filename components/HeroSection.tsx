@@ -12,11 +12,13 @@ interface Review {
 export default function HeroSection({
   heroTitle,
   heroSubtitle,
-  featuredReview
+  featuredReview,
+  googleRating = "4.7"
 }: {
   heroTitle?: string;
   heroSubtitle?: string;
   featuredReview?: Review | null;
+  googleRating?: string;
 }) {
   return (
     <section className="hero-v2">
@@ -62,7 +64,7 @@ export default function HeroSection({
                   {"★★★★★".split("").map((s, i) => (
                     <span key={i} style={{ color: "#f59e0b" }}>{s}</span>
                   ))}
-                  <span className="hero-rating-num">4.7</span>
+                  <span className="hero-rating-num">{googleRating}</span>
                 </div>
                 <div className="hero-rating-label">dari Google Review</div>
               </div>

@@ -34,12 +34,31 @@ export default function AdminReviewsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const [googleRating, setGoogleRating] = useState("4.7");
+  const [savingRating, setSavingRating] = useState(false);
+
   const load = () => {
     setLoading(true);
-    fetch("/api/reviews")
-      .then((r) => r.json())
-      .then((d) => setReviews(d.data?.reviews || []))
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch("/api/reviews").then((r) => r.json()),
+      fetch("/api/config").then((r) => r.json())
+    ]).then(([reviewsData, configData]) => {
+      setReviews(reviewsData.data?.reviews || []);
+      if (configData.data?.config?.google_review_rating) {
+        setGoogleRating(configData.data.config.google_review_rating);
+      }
+    }).finally(() => setLoading(false));
+  };
+
+  const saveGoogleRating = async () => {
+    setSavingRating(true);
+    await fetch("/api/config", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ configs: [{ key: "google_review_rating", value: googleRating }] }),
+    });
+    setSavingRating(false);
+    alert("Rating Google berhasil disimpan!");
   };
 
   useEffect(() => { load(); }, []);
@@ -109,6 +128,40 @@ export default function AdminReviewsPage() {
         <button className="btn btn-primary" onClick={openAdd} id="add-review-btn">
           ⭐ Tambah Review
         </button>
+      </div>
+
+      {/* Google Rating Config */}
+      <div style={{
+        background: "var(--surface)", border: "1px solid var(--border)",
+        borderRadius: "var(--radius-lg)", padding: "1.25rem", marginBottom: "1.5rem",
+        display: "flex", gap: "1rem", alignItems: "center", justifyContent: "space-between",
+        flexWrap: "wrap"
+      }}>
+        <div>
+          <h3 style={{ fontSize: "1.125rem", marginBottom: "0.25rem" }}>Rating Keseluruhan Google Review</h3>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", margin: 0 }}>
+            Angka ini akan ditampilkan di Hero Section (bagian atas) dan bagian Testimoni.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <input 
+            type="number" 
+            step="0.1" 
+            min="1" 
+            max="5"
+            className="form-control" 
+            style={{ width: "90px", textAlign: "center", fontWeight: "bold", fontSize: "1.125rem" }}
+            value={googleRating}
+            onChange={(e) => setGoogleRating(e.target.value)}
+          />
+          <button 
+            className="btn btn-primary" 
+            onClick={saveGoogleRating}
+            disabled={savingRating}
+          >
+            {savingRating ? "Menyimpan..." : "Simpan"}
+          </button>
+        </div>
       </div>
 
       {/* Info box */}
