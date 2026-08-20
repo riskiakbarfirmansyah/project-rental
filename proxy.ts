@@ -49,4 +49,5 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Hanya jalankan proxy untuk path /admin dan semua sub-path-nya
   matcher: ["/admin", "/admin/:path*"],
+  runtime: "experimental-edge",
 };
