@@ -1,15 +1,8 @@
-import type { OpenNextConfig } from "@opennextjs/aws/types/open-next.js";
+// @ts-check
 
-const config: OpenNextConfig = {
-  default: {
-    override: {
-      wrapper: "cloudflare-node",
-      converter: "edge",
-      incrementalCache: "dummy",
-      tagCache: "dummy",
-      queue: "dummy",
-    },
-  },
+/** @type {import("@opennextjs/cloudflare").OpenNextConfig} */
+const config = {
+  default: {},
 };
 
 export default config;
