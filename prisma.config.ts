@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -9,7 +9,7 @@ export default defineConfig({
   },
   datasource: {
     // DIRECT_URL dipakai untuk prisma migrate/db push (bypass pooler)
-    // DATABASE_URL (pooler) dipakai oleh PrismaClient di runtime via adapter
-    url: env("DIRECT_URL"),
+    // Jika tidak ada DIRECT_URL, gunakan DATABASE_URL sebagai fallback
+    url: process.env.DIRECT_URL || process.env.DATABASE_URL || "",
   },
 });
