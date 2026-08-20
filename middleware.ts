@@ -3,18 +3,15 @@ import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
 /**
- * Next.js 16 Proxy (pengganti Middleware) untuk proteksi halaman /admin.
- * Berjalan di Edge Runtime (server-side) sebelum halaman dirender —
- * tidak ada flash/flicker di browser.
- *
- * Jika token tidak ada atau tidak valid → redirect ke /login dan hapus cookie.
+ * Next.js Middleware untuk proteksi halaman /admin.
+ * Configured with experimental-edge runtime for Cloudflare Workers / OpenNext compatibility.
  */
 
 const SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "fallback_secret_change_me"
 );
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const token = request.cookies.get("auth_token")?.value;
@@ -47,7 +44,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Hanya jalankan proxy untuk path /admin dan semua sub-path-nya
+  // Hanya jalankan middleware untuk path /admin dan semua sub-path-nya
   matcher: ["/admin", "/admin/:path*"],
-  runtime: "experimental-edge",
 };
+
+export const runtime = "experimental-edge";
